@@ -1,0 +1,30 @@
+{
+  "common": {
+    "appName": "Inventar Boshqaruvi",
+    "signIn": "Google orqali kirish",
+    "signOut": "Chiqish",
+    "loading": "Yuklanmoqda..."
+  },
+  "nav": {
+    "home": "Bosh sahifa",
+    "myInventories": "Mening inventarlarim",
+    "explore": "Kashf qilish",
+    "admin": "Administrator"
+  },
+  "search": {
+    "placeholder": "Inventarlar, elementlarni qidiring..."
+  },
+  "home": {
+    "title": "Inventar Boshqaruvi",
+    "subtitle": "Maxsus maydonlar va kirish nazorati bilan inventaringizni boshqaring",
+    "phase3Title": "3-Bosqich: Autentifikatsiya",
+    "phase3Item1": "Better-auth sozlandi",
+    "phase3Item2": "Google OAuth tayyor",
+    "phase3Item3": "Sessiya boshqaruvi"
+  },
+  "theme": {
+    "light": "Yorug'",
+    "dark": "Qorong'i",
+    "system": "Tizim"
+  }
+}

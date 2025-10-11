@@ -1,0 +1,30 @@
+{
+  "common": {
+    "appName": "Inventory Management",
+    "signIn": "Sign in with Google",
+    "signOut": "Sign Out",
+    "loading": "Loading..."
+  },
+  "nav": {
+    "home": "Home",
+    "myInventories": "My Inventories",
+    "explore": "Explore",
+    "admin": "Admin"
+  },
+  "search": {
+    "placeholder": "Search inventories, items..."
+  },
+  "home": {
+    "title": "Inventory Management",
+    "subtitle": "Manage your inventory with custom fields and access control",
+    "phase3Title": "Phase 3: Authentication",
+    "phase3Item1": "Better-auth configured",
+    "phase3Item2": "Google OAuth ready",
+    "phase3Item3": "Session management"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  }
+}
