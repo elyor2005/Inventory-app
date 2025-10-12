@@ -6,13 +6,27 @@ export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "mongodb",
   }),
-  emailAndPassword: {
-    enabled: false,
+  advanced: {
+    database: {
+      generateId: false,
+    },
   },
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "user",
+      },
+      blocked: {
+        type: "boolean",
+        defaultValue: false,
+      },
     },
   },
 });

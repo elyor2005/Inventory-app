@@ -5,3 +5,15 @@ export const authClient = createAuthClient({
 });
 
 export const { signIn, signOut, useSession } = authClient;
+
+export type ExtendedSession = {
+  user: {
+    id: string;
+    email: string;
+    name: string | null;
+    image: string | null;
+    role: string;
+    blocked: boolean;
+  };
+  session: any;
+};

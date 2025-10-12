@@ -20,6 +20,7 @@ model User {
   
   sessions  Session[]
   accounts  Account[]
+  inventories  Inventory[] 
 }
 
 model Session {
@@ -65,4 +66,29 @@ model Verification {
   updatedAt  DateTime @updatedAt
   
   @@unique([identifier, value])
+}
+
+
+model Inventory {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  category    String
+  image       String?
+  isPublic    Boolean  @default(false)
+  
+  creatorId   String   @db.ObjectId
+  creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  
+  tags         String[]
+  customFields Json     @default("[]")
+  customIdFormat Json   @default("[]")
+  allowedUsers String[] @db.ObjectId
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  version     Int      @default(0)
+  
+  @@index([creatorId])
+  @@index([category])
 }
