@@ -1,5 +1,7 @@
 "use client";
 
+import { useLanguage } from "./providers/LanguageProvider";
+
 export type FieldType = "string" | "text" | "integer" | "boolean" | "date";
 
 export interface CustomFieldDefinition {
@@ -17,6 +19,7 @@ interface CustomFieldsManagerProps {
 const MAX_FIELDS_PER_TYPE = 3;
 
 export default function CustomFieldsManager({ fields, onChange }: CustomFieldsManagerProps) {
+  const { t } = useLanguage();
   // Count fields by type
   const getFieldCountByType = (type: FieldType) => {
     return fields.filter((f) => f.type === type).length;
@@ -55,18 +58,18 @@ export default function CustomFieldsManager({ fields, onChange }: CustomFieldsMa
   };
 
   const fieldTypes: { type: FieldType; label: string; icon: string }[] = [
-    { type: "string", label: "Single Line Text", icon: "📝" },
-    { type: "text", label: "Multi-line Text", icon: "📄" },
-    { type: "integer", label: "Number", icon: "🔢" },
-    { type: "date", label: "Date", icon: "📅" },
-    { type: "boolean", label: "Yes/No", icon: "☑️" },
+    { type: "string", label: t("customFieldsBuilder.types.string"), icon: "📝" },
+    { type: "text", label: t("customFieldsBuilder.types.text"), icon: "📄" },
+    { type: "integer", label: t("customFieldsBuilder.types.integer"), icon: "🔢" },
+    { type: "date", label: t("customFieldsBuilder.types.date"), icon: "📅" },
+    { type: "boolean", label: t("customFieldsBuilder.types.boolean"), icon: "☑️" },
   ];
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">Custom Fields</h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">Add up to 3 custom fields of each type to your inventory. These fields will be available when creating items.</p>
+        <h3 className="text-lg font-semibold mb-2 text-gray-900 dark:text-white">{t("customFieldsBuilder.title")}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{t("customFieldsBuilder.description")}</p>
       </div>
 
       {/* Field Type Buttons */}
@@ -94,7 +97,7 @@ export default function CustomFieldsManager({ fields, onChange }: CustomFieldsMa
       {/* Added Fields List */}
       {fields.length > 0 && (
         <div className="space-y-3">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Added Fields ({fields.length})</h4>
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">{t("customFieldsBuilder.addedFields")} ({fields.length})</h4>
           {fields.map((field, index) => {
             const fieldTypeInfo = fieldTypes.find((ft) => ft.type === field.type);
             return (
@@ -104,29 +107,29 @@ export default function CustomFieldsManager({ fields, onChange }: CustomFieldsMa
                   <div className="flex-1 space-y-3">
                     {/* Field Label */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Field Label *</label>
-                      <input type="text" value={field.label} onChange={(e) => updateField(index, { label: e.target.value })} placeholder="e.g., Color, Price, Size" className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t("customFieldsBuilder.fieldLabel")} *</label>
+                      <input type="text" value={field.label} onChange={(e) => updateField(index, { label: e.target.value })} placeholder={t("customFieldsBuilder.fieldLabelPlaceholder")} className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
                     </div>
 
                     {/* Field Type (Display Only) */}
                     <div className="flex items-center justify-between">
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Type: <span className="font-medium">{fieldTypeInfo?.label}</span>
+                        {t("customFieldsBuilder.fieldType")}: <span className="font-medium">{fieldTypeInfo?.label}</span>
                       </span>
                       <span className="text-xs text-gray-500 dark:text-gray-400">
-                        Name: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">{field.name}</code>
+                        {t("customFieldsBuilder.fieldName")}: <code className="bg-gray-200 dark:bg-gray-700 px-1 rounded">{field.name}</code>
                       </span>
                     </div>
 
                     {/* Required Checkbox */}
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input type="checkbox" checked={field.required} onChange={(e) => updateField(index, { required: e.target.checked })} className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" />
-                      <span className="text-sm text-gray-700 dark:text-gray-300">Required field</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{t("customFieldsBuilder.requiredField")}</span>
                     </label>
                   </div>
 
                   {/* Remove Button */}
-                  <button type="button" onClick={() => removeField(index)} className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors" title="Remove field">
+                  <button type="button" onClick={() => removeField(index)} className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors" title={t("customFieldsBuilder.removeField")}>
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -140,7 +143,7 @@ export default function CustomFieldsManager({ fields, onChange }: CustomFieldsMa
 
       {fields.length === 0 && (
         <div className="text-center py-8 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-          <p className="text-sm">No custom fields added yet. Click the buttons above to add fields.</p>
+          <p className="text-sm">{t("customFieldsBuilder.noFieldsYet")}</p>
         </div>
       )}
     </div>

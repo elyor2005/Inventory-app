@@ -6,6 +6,7 @@ import { useSession } from "@/lib/auth-client";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
 
@@ -35,6 +36,7 @@ export default function EditInventoryPage() {
   const params = useParams();
   const router = useRouter();
   const { data: session } = useSession();
+  const { t } = useLanguage();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -90,7 +92,7 @@ export default function EditInventoryPage() {
     // Validate custom fields have labels
     const invalidFields = customFields.filter((f) => !f.label.trim());
     if (invalidFields.length > 0) {
-      alert("Please provide labels for all custom fields");
+      alert(t("inventory.new.customFieldsError"));
       return;
     }
 
@@ -109,15 +111,15 @@ export default function EditInventoryPage() {
       if (response.ok) {
         router.push(`/inventories/${params.id}`);
       } else if (response.status === 409) {
-        alert("This inventory has been modified by another user. Please refresh and try again.");
+        alert(t("edit.conflictError"));
         fetchInventory();
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to update inventory");
+        alert(error.error || t("edit.updateError"));
       }
     } catch (error) {
       console.error("Error updating inventory:", error);
-      alert("Failed to update inventory");
+      alert(t("edit.updateError"));
     } finally {
       setSaving(false);
     }
@@ -143,7 +145,7 @@ export default function EditInventoryPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg">{t("common.loading")}</div>
       </div>
     );
   }
@@ -167,36 +169,36 @@ export default function EditInventoryPage() {
       <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-8">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Edit Inventory</h1>
-            <p className="text-gray-600 dark:text-gray-400">Update your inventory details and custom fields</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("edit.title")}</h1>
+            <p className="text-gray-600 dark:text-gray-400">{t("edit.subtitle")}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information Section */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Basic Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t("inventory.new.basicInfo")}</h2>
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">Title *</label>
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">{t("inventory.new.titleLabel")} *</label>
                 <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
               </div>
 
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Description * <span className="text-gray-500 text-xs">(Markdown supported)</span>
+                  {t("inventory.new.descriptionLabel")} * <span className="text-gray-500 text-xs">{t("inventory.new.markdownSupported")}</span>
                 </label>
                 <textarea required value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={6} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" />
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">Category *</label>
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">{t("inventory.new.categoryLabel")} *</label>
                 <select required value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
-                      {cat}
+                      {t(`categories.${cat.toLowerCase()}`)}
                     </option>
                   ))}
                 </select>
@@ -205,9 +207,9 @@ export default function EditInventoryPage() {
               {/* Image URL */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Image URL <span className="text-gray-500 text-xs">(optional)</span>
+                  {t("inventory.new.imageLabel")} <span className="text-gray-500 text-xs">{t("inventory.new.imageOptional")}</span>
                 </label>
-                <input type="url" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" placeholder="https://example.com/image.jpg" />
+                <input type="url" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" placeholder={t("inventory.new.imagePlaceholder")} />
                 {formData.image && (
                   <img
                     src={formData.image}
@@ -223,7 +225,7 @@ export default function EditInventoryPage() {
               {/* Tags */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Tags <span className="text-gray-500 text-xs">(optional)</span>
+                  {t("inventory.new.tagsLabel")} <span className="text-gray-500 text-xs">{t("inventory.new.imageOptional")}</span>
                 </label>
                 <div className="flex gap-2 mb-2">
                   <input
@@ -237,10 +239,10 @@ export default function EditInventoryPage() {
                       }
                     }}
                     className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                    placeholder="Add a tag"
+                    placeholder={t("edit.addTag")}
                   />
                   <button type="button" onClick={addTag} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition">
-                    Add
+                    {t("common.add")}
                   </button>
                 </div>
                 {formData.tags.length > 0 && (
@@ -261,7 +263,7 @@ export default function EditInventoryPage() {
               <div className="flex items-center gap-3">
                 <input type="checkbox" id="isPublic" checked={formData.isPublic} onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
                 <label htmlFor="isPublic" className="text-sm font-medium text-gray-900 dark:text-white">
-                  Make this inventory public (anyone authenticated can add items)
+                  {t("inventory.new.publicLabel")}
                 </label>
               </div>
             </div>
@@ -274,10 +276,10 @@ export default function EditInventoryPage() {
             {/* Buttons */}
             <div className="flex gap-4 sticky bottom-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
               <button type="button" onClick={() => router.back()} className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition">
-                Cancel
+                {t("common.cancel")}
               </button>
               <button type="submit" disabled={saving} className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium transition">
-                {saving ? "Saving..." : "Save Changes"}
+                {saving ? t("edit.saving") : t("edit.saveChanges")}
               </button>
             </div>
           </form>

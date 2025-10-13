@@ -5,6 +5,7 @@ import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface User {
   id: string;
@@ -22,6 +23,7 @@ interface User {
 export default function AdminPage() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
@@ -71,7 +73,7 @@ export default function AdminPage() {
 
   const toggleAdmin = async (userId: string) => {
     if (userId === session?.user.id) {
-      const confirmed = confirm("Are you sure you want to remove your own admin access? You will not be able to access this page anymore.");
+      const confirmed = confirm(t("admin.confirmRemoveOwnAdmin"));
       if (!confirmed) return;
     }
 
@@ -87,7 +89,7 @@ export default function AdminPage() {
 
         // If admin removed own access, redirect to home
         if (data.removedOwnAdmin) {
-          alert("Your admin access has been removed.");
+          alert(t("admin.ownAdminRemoved"));
           router.push("/");
         }
       }
@@ -97,7 +99,7 @@ export default function AdminPage() {
   };
 
   const deleteUser = async (userId: string) => {
-    const confirmed = confirm("Are you sure you want to delete this user? This action cannot be undone.");
+    const confirmed = confirm(t("admin.confirmDeleteUser"));
 
     if (!confirmed) return;
 
@@ -110,7 +112,7 @@ export default function AdminPage() {
         await fetchUsers();
       } else {
         const data = await response.json();
-        alert(data.error || "Failed to delete user");
+        alert(data.error || t("admin.deleteError"));
       }
     } catch (error) {
       console.error("Error deleting user:", error);
@@ -146,7 +148,7 @@ export default function AdminPage() {
   };
 
   const bulkDelete = async () => {
-    const confirmed = confirm(`Delete ${selectedUsers.size} users? This cannot be undone.`);
+    const confirmed = confirm(t("admin.confirmBulkDelete", { count: selectedUsers.size }).replace("{count}", selectedUsers.size.toString()));
     if (!confirmed) return;
 
     for (const userId of selectedUsers) {
@@ -160,7 +162,7 @@ export default function AdminPage() {
   if (isPending || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg">{t("common.loading")}</div>
       </div>
     );
   }
@@ -176,23 +178,23 @@ export default function AdminPage() {
       <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-8">
         <div className="container mx-auto px-4">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">User Management</h1>
-            <p className="text-gray-600 dark:text-gray-400">Manage all users, roles, and permissions</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("admin.title")}</h1>
+            <p className="text-gray-600 dark:text-gray-400">{t("admin.subtitle")}</p>
           </div>
 
           {/* Toolbar */}
           {selectedUsers.size > 0 && (
             <div className="mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-900 dark:text-white">{selectedUsers.size} user(s) selected</span>
+              <span className="text-sm font-medium text-gray-900 dark:text-white">{t("admin.selectedUsers").replace("{count}", selectedUsers.size.toString())}</span>
               <div className="flex gap-2">
                 <button onClick={bulkBlock} className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white text-sm rounded-lg transition">
-                  Block Selected
+                  {t("admin.blockSelected")}
                 </button>
                 <button onClick={bulkDelete} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm rounded-lg transition">
-                  Delete Selected
+                  {t("admin.deleteSelected")}
                 </button>
                 <button onClick={() => setSelectedUsers(new Set())} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded-lg transition">
-                  Cancel
+                  {t("common.cancel")}
                 </button>
               </div>
             </div>
@@ -207,12 +209,12 @@ export default function AdminPage() {
                     <th className="px-6 py-3 text-left">
                       <input type="checkbox" checked={selectedUsers.size === users.length} onChange={selectAll} className="rounded" />
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Sessions</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Joined</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.user")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.role")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.status")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.sessions")}</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.joined")}</th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("common.actions")}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
@@ -234,20 +236,20 @@ export default function AdminPage() {
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.role === "admin" ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"}`}>{user.role}</span>
                       </td>
                       <td className="px-6 py-4">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.blocked ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>{user.blocked ? "Blocked" : "Active"}</span>
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${user.blocked ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>{user.blocked ? t("admin.status.blocked") : t("admin.status.active")}</span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-300">{user._count.sessions}</td>
                       <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{new Date(user.createdAt).toLocaleDateString()}</td>
                       <td className="px-6 py-4 text-right space-x-2">
                         <button onClick={() => toggleBlock(user.id, user.blocked)} className={`text-sm font-medium ${user.blocked ? "text-green-600 hover:text-green-700 dark:text-green-400" : "text-orange-600 hover:text-orange-700 dark:text-orange-400"}`}>
-                          {user.blocked ? "Unblock" : "Block"}
+                          {user.blocked ? t("admin.actions.unblock") : t("admin.actions.block")}
                         </button>
                         <button onClick={() => toggleAdmin(user.id)} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                          {user.role === "admin" ? "Remove Admin" : "Make Admin"}
+                          {user.role === "admin" ? t("admin.actions.removeAdmin") : t("admin.actions.makeAdmin")}
                         </button>
                         {user.id !== session.user.id && (
                           <button onClick={() => deleteUser(user.id)} className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400">
-                            Delete
+                            {t("admin.actions.delete")}
                           </button>
                         )}
                       </td>
@@ -258,7 +260,7 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {users.length === 0 && <div className="text-center py-12 text-gray-500 dark:text-gray-400">No users found</div>}
+          {users.length === 0 && <div className="text-center py-12 text-gray-500 dark:text-gray-400">{t("admin.noUsers")}</div>}
         </div>
       </main>
 

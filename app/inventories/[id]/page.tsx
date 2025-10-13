@@ -7,6 +7,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import ReactMarkdown from "react-markdown";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface Inventory {
   id: string;
@@ -34,6 +35,7 @@ export default function InventoryDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { data: session } = useSession();
+  const { t } = useLanguage();
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
@@ -63,7 +65,7 @@ export default function InventoryDetailPage() {
   };
 
   const deleteInventory = async () => {
-    if (!confirm("Are you sure you want to delete this inventory? This action cannot be undone.")) {
+    if (!confirm(t("inventory.detail.deleteConfirm"))) {
       return;
     }
 
@@ -83,7 +85,7 @@ export default function InventoryDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+        <div className="text-lg">{t("common.loading")}</div>
       </div>
     );
   }
@@ -91,7 +93,7 @@ export default function InventoryDetailPage() {
   if (!inventory) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Inventory not found</div>
+        <div className="text-lg">{t("inventory.detail.notFound")}</div>
       </div>
     );
   }
@@ -101,12 +103,12 @@ export default function InventoryDetailPage() {
   const canEdit = isOwner || isAdmin;
 
   const tabs = [
-    { id: "overview", label: "Overview" },
-    { id: "items", label: "Items" },
-    { id: "settings", label: "Settings", requiresEdit: true },
-    { id: "fields", label: "Custom Fields", requiresEdit: true },
-    { id: "customid", label: "Custom ID", requiresEdit: true },
-    { id: "access", label: "Access Control", requiresEdit: true },
+    { id: "overview", label: t("inventory.detail.tabs.overview") },
+    { id: "items", label: t("inventory.detail.tabs.items") },
+    { id: "settings", label: t("inventory.detail.tabs.settings"), requiresEdit: true },
+    { id: "fields", label: t("inventory.detail.tabs.fields"), requiresEdit: true },
+    { id: "customid", label: t("inventory.detail.tabs.customid"), requiresEdit: true },
+    { id: "access", label: t("inventory.detail.tabs.access"), requiresEdit: true },
   ];
 
   return (
@@ -119,7 +121,7 @@ export default function InventoryDetailPage() {
           <div className="mb-8">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-4">
               <Link href="/inventories" className="hover:text-blue-600 dark:hover:text-blue-400">
-                My Inventories
+                {t("inventory.detail.myInventories")}
               </Link>
               <span>→</span>
               <span>{inventory.title}</span>
@@ -129,13 +131,13 @@ export default function InventoryDetailPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-4 mb-2">
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{inventory.title}</h1>
-                  {inventory.isPublic && <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 text-sm font-medium rounded-full">Public</span>}
+                  {inventory.isPublic && <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-400 text-sm font-medium rounded-full">{t("inventories.public")}</span>}
                   <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 text-sm font-medium rounded-full">{inventory.category}</span>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   {inventory.creator.image && <img src={inventory.creator.image} alt={inventory.creator.name || "User"} className="w-6 h-6 rounded-full" />}
-                  <span>Created by {inventory.creator.name || inventory.creator.email}</span>
+                  <span>{t("inventory.detail.createdBy")} {inventory.creator.name || inventory.creator.email}</span>
                   <span>•</span>
                   <span>{new Date(inventory.createdAt).toLocaleDateString()}</span>
                 </div>
@@ -144,10 +146,10 @@ export default function InventoryDetailPage() {
               {canEdit && (
                 <div className="flex gap-2">
                   <Link href={`/inventories/${inventory.id}/edit`} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
-                    Edit
+                    {t("common.edit")}
                   </Link>
                   <button onClick={deleteInventory} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition">
-                    Delete
+                    {t("common.delete")}
                   </button>
                 </div>
               )}
@@ -182,7 +184,7 @@ export default function InventoryDetailPage() {
 
                 {/* Description */}
                 <div>
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Description</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t("inventory.detail.overview.description")}</h2>
                   <div className="prose dark:prose-invert max-w-none">
                     <ReactMarkdown>{inventory.description}</ReactMarkdown>
                   </div>
@@ -191,7 +193,7 @@ export default function InventoryDetailPage() {
                 {/* Tags */}
                 {inventory.tags.length > 0 && (
                   <div>
-                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Tags</h2>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">{t("inventory.detail.overview.tags")}</h2>
                     <div className="flex flex-wrap gap-2">
                       {inventory.tags.map((tag) => (
                         <span key={tag} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full text-sm">
@@ -207,7 +209,7 @@ export default function InventoryDetailPage() {
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                       <span>⚙️</span>
-                      Custom Fields
+                      {t("inventory.detail.overview.customFields")}
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                       {(inventory.customFields as any[]).slice(0, 6).map((field, index) => (
@@ -233,7 +235,7 @@ export default function InventoryDetailPage() {
                     </div>
                     {inventory.customFields.length > 6 && canEdit && (
                       <button onClick={() => setActiveTab("fields")} className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                        View all {inventory.customFields.length} fields →
+                        {t("inventory.detail.overview.viewAllFields").replace("{count}", inventory.customFields.length.toString())} →
                       </button>
                     )}
                   </div>
@@ -243,15 +245,15 @@ export default function InventoryDetailPage() {
                 <div className="grid md:grid-cols-3 gap-4 pt-6 border-t dark:border-gray-700">
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                     <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">0</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Total Items</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{t("inventory.detail.overview.stats.totalItems")}</div>
                   </div>
                   <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
                     <div className="text-2xl font-bold text-green-600 dark:text-green-400">{inventory.allowedUsers.length}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Users with Access</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{t("inventory.detail.overview.stats.usersWithAccess")}</div>
                   </div>
                   <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
                     <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{new Date(inventory.updatedAt).toLocaleDateString()}</div>
-                    <div className="text-sm text-gray-600 dark:text-gray-400">Last Updated</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-400">{t("inventory.detail.overview.stats.lastUpdated")}</div>
                   </div>
                 </div>
               </div>
@@ -259,14 +261,14 @@ export default function InventoryDetailPage() {
 
             {activeTab === "items" && (
               <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">No items yet in this inventory</p>
-                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">Add First Item</button>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">{t("inventory.detail.items.noItems")}</p>
+                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">{t("inventory.detail.items.addFirst")}</button>
               </div>
             )}
 
             {activeTab === "settings" && canEdit && (
               <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">Settings tab - Coming in next step</p>
+                <p className="text-gray-500 dark:text-gray-400">{t("inventory.detail.settings.comingSoon")}</p>
               </div>
             )}
 
@@ -276,11 +278,11 @@ export default function InventoryDetailPage() {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between mb-6">
                       <div>
-                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Custom Fields Configuration</h2>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">These fields will be available when creating items in this inventory</p>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t("inventory.detail.fields.title")}</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t("inventory.detail.fields.subtitle")}</p>
                       </div>
                       <Link href={`/inventories/${inventory.id}/edit`} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition text-sm">
-                        Edit Fields
+                        {t("inventory.detail.fields.editButton")}
                       </Link>
                     </div>
 
@@ -291,7 +293,7 @@ export default function InventoryDetailPage() {
                             <div className="flex-1">
                               <div className="flex items-center gap-2 mb-2">
                                 <span className="text-lg font-semibold text-gray-900 dark:text-white">{field.label}</span>
-                                {field.required && <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded">Required</span>}
+                                {field.required && <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded">{t("inventory.detail.fields.required")}</span>}
                               </div>
                               <div className="flex items-center gap-2 mb-1">
                                 <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{field.type}</span>
@@ -310,11 +312,11 @@ export default function InventoryDetailPage() {
                           {/* Field Type Description */}
                           <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                              {field.type === "string" && "Single line text input"}
-                              {field.type === "text" && "Multi-line text area"}
-                              {field.type === "integer" && "Numeric value input"}
-                              {field.type === "date" && "Date picker input"}
-                              {field.type === "boolean" && "Yes/No checkbox"}
+                              {field.type === "string" && t("inventory.detail.fields.types.string")}
+                              {field.type === "text" && t("inventory.detail.fields.types.text")}
+                              {field.type === "integer" && t("inventory.detail.fields.types.integer")}
+                              {field.type === "date" && t("inventory.detail.fields.types.date")}
+                              {field.type === "boolean" && t("inventory.detail.fields.types.boolean")}
                             </p>
                           </div>
                         </div>
@@ -346,10 +348,10 @@ export default function InventoryDetailPage() {
                 ) : (
                   <div className="text-center py-12">
                     <div className="text-6xl mb-4">⚙️</div>
-                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Custom Fields Yet</h3>
-                    <p className="text-gray-500 dark:text-gray-400 mb-6">Add custom fields to capture specific information for items in this inventory</p>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t("inventory.detail.fields.noFields")}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">{t("inventory.detail.fields.noFieldsDesc")}</p>
                     <Link href={`/inventories/${inventory.id}/edit`} className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
-                      Add Custom Fields
+                      {t("inventory.detail.fields.addButton")}
                     </Link>
                   </div>
                 )}
@@ -358,13 +360,13 @@ export default function InventoryDetailPage() {
 
             {activeTab === "customid" && canEdit && (
               <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">Custom ID format - Coming in Phase 9</p>
+                <p className="text-gray-500 dark:text-gray-400">{t("inventory.detail.customid.comingSoon")}</p>
               </div>
             )}
 
             {activeTab === "access" && canEdit && (
               <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">Access control settings - Coming soon</p>
+                <p className="text-gray-500 dark:text-gray-400">{t("inventory.detail.access.comingSoon")}</p>
               </div>
             )}
           </div>

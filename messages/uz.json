@@ -3,7 +3,16 @@
     "appName": "Inventar Boshqaruvi",
     "signIn": "Google orqali kirish",
     "signOut": "Chiqish",
-    "loading": "Yuklanmoqda..."
+    "loading": "Yuklanmoqda...",
+    "cancel": "Bekor qilish",
+    "delete": "O'chirish",
+    "edit": "Tahrirlash",
+    "save": "Saqlash",
+    "add": "Qo'shish",
+    "create": "Yaratish",
+    "search": "Qidirish",
+    "filter": "Filtr",
+    "actions": "Amallar"
   },
   "nav": {
     "home": "Bosh sahifa",
@@ -26,5 +35,225 @@
     "light": "Yorug'",
     "dark": "Qorong'i",
     "system": "Tizim"
+  },
+  "inventories": {
+    "title": "Mening Inventarlarim",
+    "subtitle": "Inventar to'plamlaringizni boshqaring",
+    "createButton": "Inventar Yaratish",
+    "noInventories": "Sizda hali hech qanday inventar yo'q",
+    "createFirst": "Birinchi Inventaringizni Yarating",
+    "viewDetails": "Tafsilotlarni Ko'rish",
+    "public": "Ommaviy",
+    "deleteConfirm": "Ushbu inventarni o'chirishga ishonchingiz komilmi?",
+    "deleteSuccess": "Inventar muvaffaqiyatli o'chirildi"
+  },
+  "inventory": {
+    "new": {
+      "title": "Yangi Inventar Yaratish",
+      "subtitle": "Maxsus maydonlar bilan yangi inventar to'plamini sozlang",
+      "basicInfo": "Asosiy Ma'lumot",
+      "titleLabel": "Sarlavha",
+      "titlePlaceholder": "masalan, Ofis Uskunalari 2025",
+      "descriptionLabel": "Tavsif",
+      "descriptionPlaceholder": "Inventaringizni tasvirlab bering... **markdown** formatlashdan foydalanishingiz mumkin!",
+      "descriptionHint": "Maslahat: **qalin**, *qiyshiq*, ro'yxatlar va boshqalardan Markdown bilan foydalaning",
+      "markdownSupported": "(Markdown qo'llab-quvvatlanadi)",
+      "categoryLabel": "Kategoriya",
+      "imageLabel": "Rasm URL",
+      "imageOptional": "(ixtiyoriy)",
+      "imagePlaceholder": "https://example.com/image.jpg",
+      "tagsLabel": "Teglar",
+      "tagsPlaceholder": "Teg qo'shing va Enter bosing",
+      "publicLabel": "Ushbu inventarni ommaviy qiling (autentifikatsiya qilingan har kim element qo'sha oladi)",
+      "customFields": "Maxsus Maydonlar",
+      "creating": "Yaratilmoqda...",
+      "createButton": "Inventar Yaratish",
+      "loginRequired": "Inventar yaratish uchun tizimga kiring",
+      "customFieldsError": "Barcha maxsus maydonlar uchun yorliqlar taqdim eting",
+      "createError": "Inventar yaratib bo'lmadi"
+    },
+    "detail": {
+      "myInventories": "Mening Inventarlarim",
+      "notFound": "Inventar topilmadi",
+      "deleteConfirm": "Ushbu inventarni o'chirishga ishonchingiz komilmi? Bu amalni bekor qilib bo'lmaydi.",
+      "createdBy": "Yaratuvchi",
+      "tabs": {
+        "overview": "Umumiy ko'rinish",
+        "items": "Elementlar",
+        "settings": "Sozlamalar",
+        "fields": "Maxsus Maydonlar",
+        "customid": "Maxsus ID",
+        "access": "Kirish Nazorati"
+      },
+      "overview": {
+        "description": "Tavsif",
+        "tags": "Teglar",
+        "customFields": "Maxsus Maydonlar",
+        "viewAllFields": "Barcha {count} maydonni ko'rish",
+        "stats": {
+          "totalItems": "Jami Elementlar",
+          "usersWithAccess": "Kirishga Ega Foydalanuvchilar",
+          "lastUpdated": "Oxirgi Yangilanish"
+        }
+      },
+      "items": {
+        "noItems": "Ushbu inventarda hali element yo'q",
+        "addFirst": "Birinchi Elementni Qo'shish"
+      },
+      "fields": {
+        "title": "Maxsus Maydonlar Konfiguratsiyasi",
+        "subtitle": "Ushbu maydonlar ushbu inventarda elementlar yaratishda mavjud bo'ladi",
+        "editButton": "Maydonlarni Tahrirlash",
+        "noFields": "Hali Maxsus Maydonlar Yo'q",
+        "noFieldsDesc": "Ushbu inventardagi elementlar uchun maxsus ma'lumotlarni olish uchun maxsus maydonlar qo'shing",
+        "addButton": "Maxsus Maydonlar Qo'shish",
+        "required": "Majburiy",
+        "types": {
+          "string": "Bir qatorli matn kiritish",
+          "text": "Ko'p qatorli matn maydoni",
+          "integer": "Raqamli qiymat kiritish",
+          "date": "Sana tanlash kiritish",
+          "boolean": "Ha/Yo'q katakchasi"
+        }
+      },
+      "customid": {
+        "comingSoon": "Maxsus ID formati - 9-Bosqichda keladi"
+      },
+      "access": {
+        "comingSoon": "Kirish nazorati sozlamalari - Tez orada"
+      },
+      "settings": {
+        "comingSoon": "Sozlamalar yorlig'i - Keyingi qadamda"
+      }
+    }
+  },
+  "admin": {
+    "title": "Foydalanuvchilarni Boshqarish",
+    "subtitle": "Barcha foydalanuvchilar, rollar va ruxsatlarni boshqaring",
+    "selectedUsers": "{count} foydalanuvchi tanlandi",
+    "blockSelected": "Tanlanganlarni Bloklash",
+    "deleteSelected": "Tanlanganlarni O'chirish",
+    "noUsers": "Foydalanuvchilar topilmadi",
+    "table": {
+      "user": "Foydalanuvchi",
+      "role": "Rol",
+      "status": "Holat",
+      "sessions": "Sessiyalar",
+      "joined": "Qo'shilgan"
+    },
+    "status": {
+      "active": "Faol",
+      "blocked": "Bloklangan"
+    },
+    "actions": {
+      "block": "Bloklash",
+      "unblock": "Blokdan chiqarish",
+      "makeAdmin": "Admin Qilish",
+      "removeAdmin": "Adminlikni Olib Tashlash",
+      "delete": "O'chirish"
+    },
+    "confirmRemoveOwnAdmin": "O'zingizning admin huquqingizni olib tashlashga ishonchingiz komilmi? Endi bu sahifaga kira olmaysiz.",
+    "confirmDeleteUser": "Ushbu foydalanuvchini o'chirishga ishonchingiz komilmi? Bu amalni bekor qilib bo'lmaydi.",
+    "confirmBulkDelete": "{count} foydalanuvchini o'chirish? Buni bekor qilib bo'lmaydi.",
+    "ownAdminRemoved": "Sizning admin huquqingiz olib tashlandi.",
+    "deleteError": "Foydalanuvchini o'chirib bo'lmadi"
+  },
+  "explore": {
+    "title": "Ommaviy Inventarlarni Kashf Qilish",
+    "description": "Ushbu sahifa barcha foydalanuvchilarning barcha ommaviy inventarlarini ko'rsatadi.",
+    "comingSoon": "8-10 Bosqichlarda ommaviy inventar funksiyalarini yaratganimizda tez orada!"
+  },
+  "footer": {
+    "description": "Maxsus maydonlar va kirish nazorati bilan zamonaviy inventar boshqaruv tizimi.",
+    "quickLinks": "Tezkor Havolalar",
+    "support": "Qo'llab-quvvatlash",
+    "legal": "Huquqiy",
+    "links": {
+      "home": "Bosh sahifa",
+      "myInventories": "Mening Inventarlarim",
+      "explore": "Kashf qilish",
+      "helpCenter": "Yordam Markazi",
+      "documentation": "Hujjatlar",
+      "contactUs": "Biz bilan bog'lanish",
+      "privacy": "Maxfiylik Siyosati",
+      "terms": "Foydalanish Shartlari"
+    },
+    "copyright": "Inventar Boshqaruv Tizimi. Next.js va Prisma bilan qurilgan."
+  },
+  "categories": {
+    "equipment": "Uskunalar",
+    "furniture": "Mebel",
+    "books": "Kitoblar",
+    "documents": "Hujjatlar",
+    "electronics": "Elektronika",
+    "other": "Boshqa"
+  },
+  "navigation": {
+    "newInventory": "Yangi Inventar"
+  },
+  "homepage": {
+    "getStarted": "Boshlash",
+    "exploreInventories": "Inventarlarni Kashf Qilish",
+    "goToMyInventories": "Mening Inventarlarimga O'tish",
+    "featuresTitle": "Kuchli Inventar Boshqaruv Funksiyalari",
+    "features": {
+      "customFields": {
+        "title": "Maxsus Maydonlar",
+        "description": "Har bir inventar uchun o'z maydonlaringizni belgilang. Matn, raqamlar, katakchalar va boshqalarni qo'shing."
+      },
+      "accessControl": {
+        "title": "Kirish Nazorati",
+        "description": "Inventarlaringizni kim ko'rishi va tahrirlashi mumkinligini nazorat qiling. Ommaviy yoki shaxsiy, sizning tanlovingiz."
+      },
+      "smartTags": {
+        "title": "Aqlli Teglar",
+        "description": "Teglar bilan tartibga soling va to'liq matnli qidiruv bilan elementlarni darhol toping."
+      },
+      "customIds": {
+        "title": "Maxsus ID'lar",
+        "description": "Matn, raqamlar, sanalar va ketma-ketliklardan foydalanib o'z formatida noyob ID'lar yarating."
+      },
+      "collaboration": {
+        "title": "Hamkorlik",
+        "description": "Elementlarga izoh qoldiring, yozuvlarni yoqtiring va jamoangiz bilan real vaqtda hamkorlik qiling."
+      },
+      "statistics": {
+        "title": "Statistika",
+        "description": "Inventarlaringiz uchun umumlashtirilgan ma'lumotlar bilan tahlil va statistikani ko'ring."
+      }
+    },
+    "cta": {
+      "title": "Boshlashga tayyormisiz?",
+      "subtitle": "Inventarlarini samarali boshqarayotgan minglab foydalanuvchilarga qo'shiling",
+      "button": "Bepul Ro'yxatdan O'ting"
+    }
+  },
+  "customFieldsBuilder": {
+    "title": "Maxsus Maydonlar",
+    "description": "Inventaringizga har bir turdan 3 tagacha maxsus maydon qo'shing. Ushbu maydonlar elementlar yaratishda mavjud bo'ladi.",
+    "types": {
+      "string": "Bir Qatorli Matn",
+      "text": "Ko'p Qatorli Matn",
+      "integer": "Raqam",
+      "date": "Sana",
+      "boolean": "Ha/Yo'q"
+    },
+    "addedFields": "Qo'shilgan Maydonlar",
+    "fieldLabel": "Maydon Yorlig'i",
+    "fieldLabelPlaceholder": "masalan, Rang, Narx, O'lcham",
+    "fieldType": "Turi",
+    "fieldName": "Nomi",
+    "requiredField": "Majburiy maydon",
+    "removeField": "Maydonni olib tashlash",
+    "noFieldsYet": "Hali maxsus maydonlar qo'shilmagan. Maydonlarni qo'shish uchun yuqoridagi tugmalarni bosing."
+  },
+  "edit": {
+    "title": "Inventarni Tahrirlash",
+    "subtitle": "Inventar tafsilotlari va maxsus maydonlarini yangilang",
+    "saving": "Saqlanmoqda...",
+    "saveChanges": "O'zgarishlarni Saqlash",
+    "conflictError": "Ushbu inventar boshqa foydalanuvchi tomonidan o'zgartirilgan. Iltimos, yangilang va qayta urinib ko'ring.",
+    "updateError": "Inventarni yangilab bo'lmadi",
+    "addTag": "Teg qo'shing"
   }
 }

@@ -14,26 +14,26 @@ export default function Footer() {
           {/* About */}
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{t("common.appName")}</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Modern inventory management system with custom fields and access control.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t("footer.description")}</p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Quick Links</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{t("footer.quickLinks")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                  Home
+                  {t("footer.links.home")}
                 </Link>
               </li>
               <li>
                 <Link href="/inventories" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                  My Inventories
+                  {t("footer.links.myInventories")}
                 </Link>
               </li>
               <li>
                 <Link href="/explore" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                  Explore
+                  {t("footer.links.explore")}
                 </Link>
               </li>
             </ul>
@@ -41,21 +41,21 @@ export default function Footer() {
 
           {/* Support */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Support</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{t("footer.support")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/help" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                  Help Center
+                  {t("footer.links.helpCenter")}
                 </Link>
               </li>
               <li>
                 <Link href="/docs" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                  Documentation
+                  {t("footer.links.documentation")}
                 </Link>
               </li>
               <li>
                 <Link href="/contact" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                  Contact Us
+                  {t("footer.links.contactUs")}
                 </Link>
               </li>
             </ul>
@@ -63,16 +63,16 @@ export default function Footer() {
 
           {/* Legal */}
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Legal</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white mb-4">{t("footer.legal")}</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                  Privacy Policy
+                  {t("footer.links.privacy")}
                 </Link>
               </li>
               <li>
                 <Link href="/terms" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
-                  Terms of Service
+                  {t("footer.links.terms")}
                 </Link>
               </li>
             </ul>
@@ -81,7 +81,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-8 pt-8 border-t dark:border-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>&copy; {currentYear} Inventory Management System. Built with Next.js & Prisma.</p>
+          <p>&copy; {currentYear} {t("footer.copyright")}</p>
         </div>
       </div>
     </footer>

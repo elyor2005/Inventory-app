@@ -46,7 +46,7 @@ export default function MobileMenu() {
             {/* New Inventory Button */}
             {session && (
               <Link href="/inventories/new" onClick={() => setIsOpen(false)} className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium text-center">
-                + New Inventory
+                + {t("navigation.newInventory")}
               </Link>
             )}
           </nav>
