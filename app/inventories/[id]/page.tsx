@@ -134,7 +134,7 @@ export default function InventoryDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <img src={inventory.creator.image || ""} alt={inventory.creator.name || "User"} className="w-6 h-6 rounded-full" />
+                  {inventory.creator.image && <img src={inventory.creator.image} alt={inventory.creator.name || "User"} className="w-6 h-6 rounded-full" />}
                   <span>Created by {inventory.creator.name || inventory.creator.email}</span>
                   <span>•</span>
                   <span>{new Date(inventory.createdAt).toLocaleDateString()}</span>
@@ -202,6 +202,43 @@ export default function InventoryDetailPage() {
                   </div>
                 )}
 
+                {/* Custom Fields Section - Preview in Overview */}
+                {inventory.customFields && Array.isArray(inventory.customFields) && inventory.customFields.length > 0 && (
+                  <div>
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                      <span>⚙️</span>
+                      Custom Fields
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {(inventory.customFields as any[]).slice(0, 6).map((field, index) => (
+                        <div key={index} className="p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-800/50 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-medium text-gray-900 dark:text-white truncate">{field.label}</span>
+                                {field.required && <span className="text-xs text-red-500">*</span>}
+                              </div>
+                              <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">{field.type}</span>
+                            </div>
+                            <span className="text-lg ml-2">
+                              {field.type === "string" && "📝"}
+                              {field.type === "text" && "📄"}
+                              {field.type === "integer" && "🔢"}
+                              {field.type === "date" && "📅"}
+                              {field.type === "boolean" && "☑️"}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {inventory.customFields.length > 6 && canEdit && (
+                      <button onClick={() => setActiveTab("fields")} className="mt-3 text-sm text-blue-600 dark:text-blue-400 hover:underline">
+                        View all {inventory.customFields.length} fields →
+                      </button>
+                    )}
+                  </div>
+                )}
+
                 {/* Stats */}
                 <div className="grid md:grid-cols-3 gap-4 pt-6 border-t dark:border-gray-700">
                   <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
@@ -234,8 +271,88 @@ export default function InventoryDetailPage() {
             )}
 
             {activeTab === "fields" && canEdit && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">Custom fields configuration - Coming in Phase 8</p>
+              <div>
+                {inventory.customFields && Array.isArray(inventory.customFields) && inventory.customFields.length > 0 ? (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Custom Fields Configuration</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">These fields will be available when creating items in this inventory</p>
+                      </div>
+                      <Link href={`/inventories/${inventory.id}/edit`} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition text-sm">
+                        Edit Fields
+                      </Link>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {(inventory.customFields as any[]).map((field, index) => (
+                        <div key={index} className="p-5 border border-gray-200 dark:border-gray-700 rounded-lg bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-800 hover:border-blue-300 dark:hover:border-blue-700 transition-all hover:shadow-md">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-lg font-semibold text-gray-900 dark:text-white">{field.label}</span>
+                                {field.required && <span className="px-2 py-0.5 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-medium rounded">Required</span>}
+                              </div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">{field.type}</span>
+                              </div>
+                              <code className="text-xs text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded">{field.name}</code>
+                            </div>
+                            <span className="text-2xl">
+                              {field.type === "string" && "📝"}
+                              {field.type === "text" && "📄"}
+                              {field.type === "integer" && "🔢"}
+                              {field.type === "date" && "📅"}
+                              {field.type === "boolean" && "☑️"}
+                            </span>
+                          </div>
+
+                          {/* Field Type Description */}
+                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                              {field.type === "string" && "Single line text input"}
+                              {field.type === "text" && "Multi-line text area"}
+                              {field.type === "integer" && "Numeric value input"}
+                              {field.type === "date" && "Date picker input"}
+                              {field.type === "boolean" && "Yes/No checkbox"}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Summary Stats */}
+                    <div className="mt-8 grid grid-cols-2 md:grid-cols-5 gap-4">
+                      {["string", "text", "integer", "date", "boolean"].map((type) => {
+                        const count = (inventory.customFields as any[]).filter((f) => f.type === type).length;
+                        const icon = {
+                          string: "📝",
+                          text: "📄",
+                          integer: "🔢",
+                          date: "📅",
+                          boolean: "☑️",
+                        }[type];
+
+                        return (
+                          <div key={type} className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-center">
+                            <div className="text-2xl mb-1">{icon}</div>
+                            <div className="text-lg font-bold text-gray-900 dark:text-white">{count}/3</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">{type}</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">⚙️</div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">No Custom Fields Yet</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">Add custom fields to capture specific information for items in this inventory</p>
+                    <Link href={`/inventories/${inventory.id}/edit`} className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
+                      Add Custom Fields
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 
