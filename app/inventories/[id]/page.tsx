@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import ReactMarkdown from "react-markdown";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-import Image from "next/image";
+import ItemsList from "@/components/ItemsList";
 
 interface Inventory {
   id: string;
@@ -46,6 +46,7 @@ export default function InventoryDetailPage() {
     if (params.id) {
       fetchInventory();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.id]);
 
   const fetchInventory = async () => {
@@ -101,7 +102,7 @@ export default function InventoryDetailPage() {
   }
 
   const isOwner = session?.user.id === inventory.creator.id;
-  const isAdmin = session?.user.role === "admin";
+  const isAdmin = (session?.user as { role?: string })?.role === "admin";
   const canEdit = isOwner || isAdmin;
 
   const tabs = [
@@ -264,9 +265,8 @@ export default function InventoryDetailPage() {
             )}
 
             {activeTab === "items" && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400 mb-4">{t("inventory.detail.items.noItems")}</p>
-                <button className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">{t("inventory.detail.items.addFirst")}</button>
+              <div>
+                <ItemsList inventoryId={inventory.id} canEdit={canEdit} isPublic={inventory.isPublic} />
               </div>
             )}
 
