@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-
+import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
 
 interface CustomFieldDefinition {
@@ -52,6 +52,14 @@ export default function EditInventoryPage() {
     version: 0,
   });
   const [tagInput, setTagInput] = useState("");
+  const [customIdFormat, setCustomIdFormat] = useState<CustomIdFormat>({
+    enabled: false,
+    prefix: "",
+    suffix: "",
+    counterStart: 1,
+    counterPadding: 3,
+    currentCounter: 1,
+  });
 
   useEffect(() => {
     fetchInventory();
@@ -75,6 +83,16 @@ export default function EditInventoryPage() {
         });
         // Set custom fields
         setCustomFields(data.inventory.customFields || []);
+        setCustomIdFormat(
+          data.inventory.customIdFormat || {
+            enabled: false,
+            prefix: "",
+            suffix: "",
+            counterStart: 1,
+            counterPadding: 3,
+            currentCounter: 1,
+          }
+        );
       } else {
         router.push("/inventories");
       }
@@ -105,6 +123,7 @@ export default function EditInventoryPage() {
         body: JSON.stringify({
           ...formData,
           customFields: customFields,
+          customIdFormat: customIdFormat,
         }),
       });
 
@@ -220,6 +239,9 @@ export default function EditInventoryPage() {
                     }}
                   />
                 )}
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                  <CustomIdBuilder format={customIdFormat} onChange={setCustomIdFormat} />
+                </div>
               </div>
 
               {/* Tags */}

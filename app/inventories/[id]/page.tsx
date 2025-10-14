@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -8,6 +9,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import ReactMarkdown from "react-markdown";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import Image from "next/image";
 
 interface Inventory {
   id: string;
@@ -137,7 +139,9 @@ export default function InventoryDetailPage() {
 
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                   {inventory.creator.image && <img src={inventory.creator.image} alt={inventory.creator.name || "User"} className="w-6 h-6 rounded-full" />}
-                  <span>{t("inventory.detail.createdBy")} {inventory.creator.name || inventory.creator.email}</span>
+                  <span>
+                    {t("inventory.detail.createdBy")} {inventory.creator.name || inventory.creator.email}
+                  </span>
                   <span>•</span>
                   <span>{new Date(inventory.createdAt).toLocaleDateString()}</span>
                 </div>
@@ -359,8 +363,93 @@ export default function InventoryDetailPage() {
             )}
 
             {activeTab === "customid" && canEdit && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400">{t("inventory.detail.customid.comingSoon")}</p>
+              <div>
+                {inventory.customIdFormat && (inventory.customIdFormat as any).enabled ? (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t("custom_id_system") || "Custom ID Configuration"}</h2>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{t("custom_id_subtitle") || "Item IDs will be automatically generated using this format"}</p>
+                      </div>
+                      <Link href={`/inventories/${inventory.id}/edit`} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition text-sm">
+                        {t("edit_format") || "Edit Format"}
+                      </Link>
+                    </div>
+
+                    {/* ID Format Display */}
+                    <div className="grid md:grid-cols-2 gap-6">
+                      {/* Left Column - Format Details */}
+                      <div className="space-y-4">
+                        <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t("id_prefix") || "Prefix"}</div>
+                          <div className="text-lg font-mono text-gray-900 dark:text-white">{(inventory.customIdFormat as any).prefix || <span className="text-gray-400 italic">{t("none") || "None"}</span>}</div>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t("counter") || "Counter"}</div>
+                          <div className="text-lg font-mono text-gray-900 dark:text-white">
+                            {t("start") || "Start"}: {(inventory.customIdFormat as any).counterStart} | {t("padding") || "Padding"}: {(inventory.customIdFormat as any).counterPadding}
+                          </div>
+                        </div>
+
+                        <div className="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                          <div className="text-sm text-gray-600 dark:text-gray-400 mb-1">{t("id_suffix") || "Suffix"}</div>
+                          <div className="text-lg font-mono text-gray-900 dark:text-white">{(inventory.customIdFormat as any).suffix || <span className="text-gray-400 italic">{t("none") || "None"}</span>}</div>
+                        </div>
+                      </div>
+
+                      {/* Right Column - Preview */}
+                      <div className="p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-4">{t("next_id_will_be") || "Next Item ID"}</h3>
+                        <div className="text-3xl font-mono font-bold text-blue-600 dark:text-blue-400 mb-6 break-all">
+                          {(() => {
+                            const format = inventory.customIdFormat as any;
+                            const counter = (format.currentCounter || format.counterStart).toString().padStart(format.counterPadding, "0");
+                            return `${format.prefix}${counter}${format.suffix}`;
+                          })()}
+                        </div>
+
+                        <div className="pt-4 border-t border-blue-200 dark:border-blue-800">
+                          <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">{t("example_ids") || "Example IDs"}:</p>
+                          <div className="flex flex-wrap gap-2">
+                            {[0, 1, 2, 3, 4].map((i) => {
+                              const format = inventory.customIdFormat as any;
+                              const counter = ((format.currentCounter || format.counterStart) + i).toString().padStart(format.counterPadding, "0");
+                              return (
+                                <code key={i} className="px-2 py-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded text-xs font-mono text-gray-700 dark:text-gray-300">
+                                  {`${format.prefix}${counter}${format.suffix}`}
+                                </code>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Statistics */}
+                    <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm text-gray-600 dark:text-gray-400">{t("current_counter") || "Current Counter"}</div>
+                          <div className="text-2xl font-bold text-gray-900 dark:text-white">{(inventory.customIdFormat as any).currentCounter || (inventory.customIdFormat as any).counterStart}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm text-gray-600 dark:text-gray-400">{t("total_items") || "Total Items"}</div>
+                          <div className="text-2xl font-bold text-gray-900 dark:text-white">0</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <div className="text-6xl mb-4">🔢</div>
+                    <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{t("custom_id_disabled") || "Custom ID Generation Disabled"}</h3>
+                    <p className="text-gray-500 dark:text-gray-400 mb-6">{t("custom_id_disabled_desc") || "Enable custom ID generation to automatically create unique IDs for items"}</p>
+                    <Link href={`/inventories/${inventory.id}/edit`} className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
+                      {t("configure_custom_id") || "Configure Custom ID"}
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
 

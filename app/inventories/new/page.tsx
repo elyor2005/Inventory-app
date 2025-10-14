@@ -5,17 +5,35 @@ import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
-import CustomFieldsManager from "@/components/CustomFieldsBuilder";
-// import CustomFieldsManager, { CustomFieldDefinition } from "@/components/CustomFieldsManager";
+import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
+import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
+import { useLanguage } from "@/components/providers/LanguageProvider";
+import Image from "next/image";
 
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
+
+interface CustomFieldDefinition {
+  name: string;
+  type: string;
+  label: string;
+  required: boolean;
+}
 
 export default function NewInventoryPage() {
   const { data: session } = useSession();
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [loading, setLoading] = useState(false);
   const [customFields, setCustomFields] = useState<CustomFieldDefinition[]>([]);
+  const [customIdFormat, setCustomIdFormat] = useState<CustomIdFormat>({
+    enabled: false,
+    prefix: "",
+    suffix: "",
+    counterStart: 1,
+    counterPadding: 3,
+    currentCounter: 1,
+  });
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -32,7 +50,7 @@ export default function NewInventoryPage() {
     // Validate custom fields have labels
     const invalidFields = customFields.filter((f) => !f.label.trim());
     if (invalidFields.length > 0) {
-      alert("Please provide labels for all custom fields");
+      alert(t("error_empty_field_labels") || "Please provide labels for all custom fields");
       return;
     }
 
@@ -44,7 +62,8 @@ export default function NewInventoryPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          customFields: customFields, // Add custom fields to the request
+          customFields: customFields,
+          customIdFormat: customIdFormat,
         }),
       });
 
@@ -53,11 +72,11 @@ export default function NewInventoryPage() {
         router.push(`/inventories/${data.inventory.id}`);
       } else {
         const error = await response.json();
-        alert(error.error || "Failed to create inventory");
+        alert(error.error || t("error_create_inventory") || "Failed to create inventory");
       }
     } catch (error) {
       console.error("Error creating inventory:", error);
-      alert("Failed to create inventory");
+      alert(t("error_create_inventory") || "Failed to create inventory");
     } finally {
       setLoading(false);
     }
@@ -83,7 +102,7 @@ export default function NewInventoryPage() {
   if (!session) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Please log in to create an inventory</p>
+        <p>{t("login_required") || "Please log in to create an inventory"}</p>
       </div>
     );
   }
@@ -95,37 +114,37 @@ export default function NewInventoryPage() {
       <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-8">
         <div className="container mx-auto px-4 max-w-3xl">
           <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create New Inventory</h1>
-            <p className="text-gray-600 dark:text-gray-400">Set up a new inventory collection with custom fields</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">{t("create_inventory") || "Create New Inventory"}</h1>
+            <p className="text-gray-600 dark:text-gray-400">{t("create_inventory_subtitle") || "Set up a new inventory collection with custom fields and ID format"}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information Section */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Basic Information</h2>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">{t("basic_information") || "Basic Information"}</h2>
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">Title *</label>
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">{t("inventory_title") || "Title"} *</label>
                 <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" placeholder="e.g., Office Equipment 2025" />
               </div>
 
               {/* Description */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Description * <span className="text-gray-500 text-xs">(Markdown supported)</span>
+                  {t("description") || "Description"} * <span className="text-gray-500 text-xs">({t("markdown_supported") || "Markdown supported"})</span>
                 </label>
-                <textarea required value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={6} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" placeholder="Describe your inventory... You can use **markdown** formatting!" />
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Tip: Use **bold**, *italic*, lists, and more with Markdown</p>
+                <textarea required value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={6} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" placeholder={t("description_placeholder") || "Describe your inventory... You can use **markdown** formatting!"} />
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t("markdown_tip") || "Tip: Use **bold**, *italic*, lists, and more with Markdown"}</p>
               </div>
 
               {/* Category */}
               <div>
-                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">Category *</label>
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">{t("category") || "Category"} *</label>
                 <select required value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500">
                   {CATEGORIES.map((cat) => (
                     <option key={cat} value={cat}>
-                      {cat}
+                      {t(`category_${cat.toLowerCase()}`) || cat}
                     </option>
                   ))}
                 </select>
@@ -134,13 +153,15 @@ export default function NewInventoryPage() {
               {/* Image URL */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Image URL <span className="text-gray-500 text-xs">(optional)</span>
+                  {t("image_url") || "Image URL"} <span className="text-gray-500 text-xs">({t("optional") || "optional"})</span>
                 </label>
                 <input type="url" value={formData.image} onChange={(e) => setFormData({ ...formData, image: e.target.value })} className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500" placeholder="https://example.com/image.jpg" />
                 {formData.image && (
-                  <img
+                  <Image
                     src={formData.image}
                     alt="Preview"
+                    width={100}
+                    height={100}
                     className="mt-2 w-full max-h-64 object-cover rounded-lg"
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
@@ -152,7 +173,7 @@ export default function NewInventoryPage() {
               {/* Tags */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
-                  Tags <span className="text-gray-500 text-xs">(optional)</span>
+                  {t("tags") || "Tags"} <span className="text-gray-500 text-xs">({t("optional") || "optional"})</span>
                 </label>
                 <div className="flex gap-2 mb-2">
                   <input
@@ -166,10 +187,10 @@ export default function NewInventoryPage() {
                       }
                     }}
                     className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
-                    placeholder="Add a tag and press Enter"
+                    placeholder={t("add_tag_placeholder") || "Add a tag and press Enter"}
                   />
                   <button type="button" onClick={addTag} className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition">
-                    Add
+                    {t("add") || "Add"}
                   </button>
                 </div>
                 {formData.tags.length > 0 && (
@@ -190,23 +211,28 @@ export default function NewInventoryPage() {
               <div className="flex items-center gap-3">
                 <input type="checkbox" id="isPublic" checked={formData.isPublic} onChange={(e) => setFormData({ ...formData, isPublic: e.target.checked })} className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" />
                 <label htmlFor="isPublic" className="text-sm font-medium text-gray-900 dark:text-white">
-                  Make this inventory public (anyone authenticated can add items)
+                  {t("make_public") || "Make this inventory public (anyone authenticated can add items)"}
                 </label>
               </div>
             </div>
 
             {/* Custom Fields Section */}
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <CustomFieldsManager fields={customFields} onChange={setCustomFields} />
+              <CustomFieldsBuilder fields={customFields} onChange={setCustomFields} />
+            </div>
+
+            {/* Custom ID Format Section - NEW */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+              <CustomIdBuilder format={customIdFormat} onChange={setCustomIdFormat} />
             </div>
 
             {/* Buttons */}
             <div className="flex gap-4 sticky bottom-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
               <button type="button" onClick={() => router.back()} className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition">
-                Cancel
+                {t("cancel") || "Cancel"}
               </button>
               <button type="submit" disabled={loading} className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium transition">
-                {loading ? "Creating..." : "Create Inventory"}
+                {loading ? t("creating") || "Creating..." : t("create_inventory") || "Create Inventory"}
               </button>
             </div>
           </form>

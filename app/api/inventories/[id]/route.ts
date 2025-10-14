@@ -40,7 +40,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const body = await request.json();
-    const { title, description, category, image, tags, isPublic, version } = body;
+    const { title, description, category, image, tags, isPublic, customFields, customIdFormat, version } = body;
 
     // Get existing inventory
     const existing = await prisma.inventory.findUnique({
@@ -61,16 +61,37 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       return Response.json({ error: "Inventory has been modified. Please refresh." }, { status: 409 });
     }
 
+    // Validate custom fields if provided
+    if (customFields && Array.isArray(customFields)) {
+      const invalidFields = customFields.filter((f: { label?: string }) => !f.label || !f.label.trim());
+      if (invalidFields.length > 0) {
+        return Response.json({ error: "All custom fields must have labels" }, { status: 400 });
+      }
+
+      const fieldCounts = customFields.reduce((acc: Record<string, number>, field: { type: string }) => {
+        acc[field.type] = (acc[field.type] || 0) + 1;
+        return acc;
+      }, {});
+
+      for (const [type, count] of Object.entries(fieldCounts)) {
+        if ((count as number) > 3) {
+          return Response.json({ error: `Maximum 3 fields allowed per type. Found ${count} fields of type ${type}` }, { status: 400 });
+        }
+      }
+    }
+
     // Update
     const inventory = await prisma.inventory.update({
       where: { id: params.id },
       data: {
-        ...(title && { title }),
-        ...(description && { description }),
-        ...(category && { category }),
-        ...(image !== undefined && { image }),
-        ...(tags && { tags }),
-        ...(isPublic !== undefined && { isPublic }),
+        title,
+        description,
+        category,
+        image: image || null,
+        isPublic: isPublic !== undefined ? isPublic : existing.isPublic,
+        tags: tags || existing.tags,
+        customFields: customFields || existing.customFields,
+        customIdFormat: customIdFormat || existing.customIdFormat, // ADD THIS LINE
         version: { increment: 1 },
       },
       include: {

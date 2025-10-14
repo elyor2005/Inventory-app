@@ -78,11 +78,12 @@ model Inventory {
   image       String?
   isPublic    Boolean  @default(false)
 
-  integerFields Json?  
-  stringFields  Json?  
-  textFields    Json?  
-  booleanFields Json?  
-  dateFields    Json?  
+  // integerFields Json?  
+  // stringFields  Json?  
+  // textFields    Json?  
+  // booleanFields Json?  
+  // dateFields    Json?  
+  
   
   creatorId   String   @db.ObjectId
   creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)

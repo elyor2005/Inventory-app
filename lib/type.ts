@@ -4,6 +4,14 @@ export interface CustomField {
   enabled: boolean;
 }
 
+// Custom field definition with full details
+export interface CustomFieldDefinition {
+  name: string;
+  type: string;
+  label: string;
+  required: boolean;
+}
+
 // Custom field values for items
 export interface CustomFieldValues {
   [key: string]: string | number | boolean | null;
@@ -12,9 +20,9 @@ export interface CustomFieldValues {
 // Inventory with custom fields
 export interface InventoryWithCustomFields {
   id: string;
-  name: string;
+  title: string;
   description: string | null;
-  topic: string;
+  category: string;
   integerFields?: CustomField[];
   stringFields?: CustomField[];
   textFields?: CustomField[];

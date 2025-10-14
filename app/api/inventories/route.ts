@@ -52,9 +52,15 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { title, description, category, image, tags, isPublic, customFields } = body;
+    const { title, description, category, image, tags, isPublic, customFields, customIdFormat } = body;
 
-    console.log("Creating inventory:", { title, category, userId: user.id, customFieldsCount: customFields?.length || 0 });
+    console.log("Creating inventory:", {
+      title,
+      category,
+      userId: user.id,
+      customFieldsCount: customFields?.length || 0,
+      customIdEnabled: customIdFormat?.enabled || false,
+    });
 
     // Validation
     if (!title || !description || !category) {
@@ -63,13 +69,13 @@ export async function POST(request: NextRequest) {
 
     // Validate custom fields if provided
     if (customFields && Array.isArray(customFields)) {
-      const invalidFields = customFields.filter((f: any) => !f.label || !f.label.trim());
+      const invalidFields = customFields.filter((f: { label?: string }) => !f.label || !f.label.trim());
       if (invalidFields.length > 0) {
         return Response.json({ error: "All custom fields must have labels" }, { status: 400 });
       }
 
       // Count fields by type
-      const fieldCounts = customFields.reduce((acc: any, field: any) => {
+      const fieldCounts = customFields.reduce((acc: Record<string, number>, field: { type: string }) => {
         acc[field.type] = (acc[field.type] || 0) + 1;
         return acc;
       }, {});
@@ -92,7 +98,7 @@ export async function POST(request: NextRequest) {
         tags: tags || [],
         creatorId: user.id,
         customFields: customFields || [],
-        customIdFormat: [],
+        customIdFormat: customIdFormat || {}, // ADD THIS LINE
         allowedUsers: [],
       },
       include: {

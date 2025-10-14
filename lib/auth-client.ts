@@ -15,5 +15,12 @@ export type ExtendedSession = {
     role: string;
     blocked: boolean;
   };
-  session: any;
+  session: {
+    id: string;
+    userId: string;
+    expiresAt: Date;
+    token: string;
+    ipAddress?: string;
+    userAgent?: string;
+  };
 };
