@@ -22,6 +22,7 @@ model User {
   accounts  Account[]
   inventories  Inventory[] 
   items         Item[]
+  comments     Comment[]
 }
 
 model Session {
@@ -78,13 +79,6 @@ model Inventory {
   image       String?
   isPublic    Boolean  @default(false)
 
-  // integerFields Json?  
-  // stringFields  Json?  
-  // textFields    Json?  
-  // booleanFields Json?  
-  // dateFields    Json?  
-  
-  
   creatorId   String   @db.ObjectId
   creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
@@ -121,6 +115,8 @@ model Item {
   
   creatorId   String   @db.ObjectId
   creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+
+  comments    Comment[] 
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -128,4 +124,25 @@ model Item {
   @@index([inventoryId])
   @@index([creatorId])
   @@index([tags])
+}
+
+model Comment {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  content   String
+  itemId    String   @db.ObjectId
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  authorId  String   @db.ObjectId
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+ 
+  parentId  String?  @db.ObjectId
+  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies   Comment[] @relation("CommentReplies")
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([itemId])
+  @@index([authorId])
+  @@index([parentId])
 }

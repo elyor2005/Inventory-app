@@ -8,7 +8,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-
+import CommentsSection from "@/components/CommentsSection";
 interface Item {
   id: string;
   name: string;
@@ -102,7 +102,7 @@ export default function ItemDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">{t("common.loading") || "Loading..."}</div>
+        <div className="text-lg">{t("loading") || "Loading..."}</div>
       </div>
     );
   }
@@ -179,10 +179,10 @@ export default function ItemDetailPage() {
               {canEdit && (
                 <div className="flex gap-2">
                   <Link href={`/inventories/${params.id}/items/${item.id}/edit`} className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition">
-                    {t("common.edit")}
+                    {t("edit") || "Edit"}
                   </Link>
                   <button onClick={deleteItem} className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition">
-                    {t("common.delete")}
+                    {t("delete") || "Delete"}
                   </button>
                 </div>
               )}
@@ -211,6 +211,10 @@ export default function ItemDetailPage() {
               </div>
             </div>
           )}
+          {/* Comments Section */}
+          <div className="mt-8">
+            <CommentsSection itemId={item.id} inventoryId={params.id as string} />
+          </div>
 
           {/* Back Button */}
           <div className="mt-6">
