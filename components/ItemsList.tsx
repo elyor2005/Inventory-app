@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-
+import LikeButton from "./LikeButton";
 interface Item {
   id: string;
   name: string;
@@ -140,11 +140,7 @@ export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListP
           </div>
 
           {/* Results Count */}
-          {(searchQuery || selectedTag) && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              {t("showing_items") ? String(t("showing_items")).replace("{count}", filteredItems.length.toString()).replace("{total}", items.length.toString()) : `Showing ${filteredItems.length} of ${items.length} items`}
-            </div>
-          )}
+          {(searchQuery || selectedTag) && <div className="text-sm text-gray-600 dark:text-gray-400">{t("showing_items") ? String(t("showing_items")).replace("{count}", filteredItems.length.toString()).replace("{total}", items.length.toString()) : `Showing ${filteredItems.length} of ${items.length} items`}</div>}
 
           {/* Items Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -187,6 +183,10 @@ export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListP
                       </button>
                     </>
                   )}
+                </div>
+                {/* Like Button */}
+                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                  <LikeButton itemId={item.id} inventoryId={inventoryId} showCount={true} />
                 </div>
               </div>
             ))}

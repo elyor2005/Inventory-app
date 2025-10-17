@@ -18,11 +18,12 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
-  sessions  Session[]
-  accounts  Account[]
-  inventories  Inventory[] 
-  items         Item[]
-  comments     Comment[]
+  sessions       Session[]
+  accounts       Account[]
+  inventories    Inventory[] 
+  items          Item[]
+  comments       Comment[]
+  likes          Like[]  
 }
 
 model Session {
@@ -117,6 +118,7 @@ model Item {
   creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
   comments    Comment[] 
+  likes       Like[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -145,4 +147,17 @@ model Comment {
   @@index([itemId])
   @@index([authorId])
   @@index([parentId])
+}
+
+model Like {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  itemId    String   @db.ObjectId
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  userId    String   @db.ObjectId
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  @@unique([itemId, userId]) // Prevent duplicate likes
+  @@index([itemId])
+  @@index([userId])
 }

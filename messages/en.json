@@ -399,5 +399,20 @@
   "edit": "Edit",
   "delete": "Delete",
   "save": "Save",
-  "cancel": "Cancel"
+  "cancel": "Cancel",
+  "likes": "Likes",
+  "like": "Like",
+  "unlike": "Unlike",
+  "liked_by": "Liked by",
+  "you_and_others": "You and {count} others",
+  "you_liked_this": "You liked this",
+  "be_first_to_like": "Be the first to like this",
+  "people_liked": "{count} people liked this",
+  "person_liked": "1 person liked this",
+  "no_likes_yet": "No likes yet",
+  "view_likes": "View Likes",
+  "who_liked": "Who Liked This",
+  "liked_on": "Liked on",
+  "error_like": "Failed to like item",
+  "error_unlike": "Failed to unlike item"
 }

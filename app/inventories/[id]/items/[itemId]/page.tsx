@@ -9,6 +9,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import CommentsSection from "@/components/CommentsSection";
+import LikeButton from "@/components/LikeButton";
+import LikesModal from "@/components/LikesModal";
 interface Item {
   id: string;
   name: string;
@@ -46,7 +48,8 @@ export default function ItemDetailPage() {
   const [item, setItem] = useState<Item | null>(null);
   const [inventory, setInventory] = useState<Inventory | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [showLikesModal, setShowLikesModal] = useState(false);
+  const [likesCount, setLikesCount] = useState(0);
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,6 +72,13 @@ export default function ItemDetailPage() {
         setItem(itemData.item);
       } else {
         router.push(`/inventories/${params.id}`);
+      }
+
+      // Fetch likes count
+      const likesResponse = await fetch(`/api/inventories/${params.id}/items/${params.itemId}/likes`);
+      if (likesResponse.ok) {
+        const likesData = await likesResponse.json();
+        setLikesCount(likesData.likes.length);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -173,6 +183,17 @@ export default function ItemDetailPage() {
                     {t("created_on") || "Created"}: {new Date(item.createdAt).toLocaleDateString()}
                   </span>
                 </div>
+                {/* Like Button and Count */}
+                <div className="flex items-center gap-4 mb-4">
+                  <LikeButton itemId={item.id} inventoryId={params.id as string} showCount={true} />
+
+                  {likesCount > 0 && (
+                    <button onClick={() => setShowLikesModal(true)} className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 hover:underline">
+                      {likesCount === 1 ? t("person_liked") || "1 person liked this" : (t("people_liked") || "{count} people liked this").replace("{count}", likesCount.toString())}
+                    </button>
+                  )}
+                </div>
+                <LikesModal itemId={item.id} inventoryId={params.id as string} isOpen={showLikesModal} onClose={() => setShowLikesModal(false)} />
               </div>
 
               {/* Actions */}

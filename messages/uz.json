@@ -399,5 +399,20 @@
   "edit": "Tahrirlash",
   "delete": "O'chirish",
   "save": "Saqlash",
-  "cancel": "Bekor qilish"
+  "cancel": "Bekor qilish",
+  "likes": "Yoqtirishlar",
+  "like": "Yoqtirish",
+  "unlike": "Yoqtirishni Bekor Qilish",
+  "liked_by": "Yoqtirilgan",
+  "you_and_others": "Siz va {count} kishi",
+  "you_liked_this": "Siz buni yoqtirdingiz",
+  "be_first_to_like": "Birinchi bo'lib yoqtiring",
+  "people_liked": "{count} kishi buni yoqtirdi",
+  "person_liked": "1 kishi buni yoqtirdi",
+  "no_likes_yet": "Hali yoqtirilmagan",
+  "view_likes": "Yoqtirishlarni Ko'rish",
+  "who_liked": "Kim Yoqtirdi",
+  "liked_on": "Yoqtirilgan",
+  "error_like": "Yoqtirishda xatolik",
+  "error_unlike": "Yoqtirishni bekor qilishda xatolik"
 }
