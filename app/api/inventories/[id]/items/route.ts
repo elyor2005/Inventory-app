@@ -4,8 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/admin";
 
 // POST - Create new item
-export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser(request);
 
     if (!user) {
@@ -13,7 +14,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     }
 
     const inventory = await prisma.inventory.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         creatorId: true,
@@ -51,7 +52,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 
       // Update counter in inventory
       await prisma.inventory.update({
-        where: { id: params.id },
+        where: { id },
         data: {
           customIdFormat: {
             ...idFormat,
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
     if (customFieldValues) {
       // Get inventory custom fields to determine types
       const inv = await prisma.inventory.findUnique({
-        where: { id: params.id },
+        where: { id },
         select: { customFields: true },
       });
 
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
       data: {
         name,
         tags: tags || [],
-        inventoryId: params.id,
+        inventoryId: id,
         creatorId: user.id,
         stringValues: Object.keys(stringValues).length > 0 ? stringValues : null,
         textValues: Object.keys(textValues).length > 0 ? textValues : null,
@@ -133,10 +134,11 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 }
 
 // GET - List items in inventory
-export async function GET(_request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const inventory = await prisma.inventory.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         isPublic: true,
@@ -148,7 +150,7 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
     }
 
     const items = await prisma.item.findMany({
-      where: { inventoryId: params.id },
+      where: { inventoryId: id },
       include: {
         creator: {
           select: {

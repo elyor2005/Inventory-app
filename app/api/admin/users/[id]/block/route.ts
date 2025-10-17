@@ -2,15 +2,16 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/admin";
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const unauthorized = await requireAdmin(request);
   if (unauthorized) return unauthorized;
 
   try {
+    const { id } = await params;
     const { blocked } = await request.json();
 
     const user = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: { blocked },
     });
 

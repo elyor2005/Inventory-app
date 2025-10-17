@@ -1,20 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider as NextThemesProvider, ThemeProviderProps as NextThemesProviderProps } from "next-themes";
 
-type ThemeProviderProps = {
+type ThemeProviderProps = Omit<NextThemesProviderProps, 'children'> & {
   children: React.ReactNode;
-  attribute?: string;
-  defaultTheme?: string;
-  enableSystem?: boolean;
-  disableTransitionOnChange?: boolean;
-  storageKey?: string;
 };
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
-    <NextThemesProvider {...props} storageKey="app-theme" storage key forcedTheme={undefined}>
+    <NextThemesProvider {...props} storageKey="app-theme">
       {children}
     </NextThemesProvider>
   );

@@ -3,10 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/admin";
 
 // GET single inventory
-export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const inventory = await prisma.inventory.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         creator: {
           select: {
@@ -31,8 +32,9 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 }
 
 // PATCH update inventory
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser(request);
 
     if (!user) {
@@ -44,7 +46,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     // Get existing inventory
     const existing = await prisma.inventory.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existing) {
@@ -82,7 +84,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 
     // Update
     const inventory = await prisma.inventory.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         description,
@@ -114,8 +116,9 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 // DELETE inventory
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;
     const user = await getCurrentUser(request);
 
     if (!user) {
@@ -123,7 +126,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     const inventory = await prisma.inventory.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!inventory) {
@@ -136,7 +139,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     await prisma.inventory.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return Response.json({ message: "Inventory deleted successfully" });

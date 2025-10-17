@@ -8,13 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import ItemForm from "@/components/ItemForm";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-
-interface CustomFieldDefinition {
-  name: string;
-  type: string;
-  label: string;
-  required: boolean;
-}
+import { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 
 interface Item {
   id: string;

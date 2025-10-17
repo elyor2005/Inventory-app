@@ -8,13 +8,7 @@ import Footer from "@/components/layout/Footer";
 import ItemForm from "@/components/ItemForm";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import Link from "next/link";
-
-interface CustomFieldDefinition {
-  name: string;
-  type: string;
-  label: string;
-  required: boolean;
-}
+import { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 
 interface CustomIdFormat {
   enabled: boolean;

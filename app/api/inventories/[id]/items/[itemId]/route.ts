@@ -4,10 +4,11 @@ import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/admin";
 
 // GET single item
-export async function GET(_request: NextRequest, { params }: { params: { id: string; itemId: string } }) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string; itemId: string }> }) {
   try {
+    const { id, itemId } = await params;
     const item = await prisma.item.findUnique({
-      where: { id: params.itemId },
+      where: { id: itemId },
       include: {
         creator: {
           select: {
@@ -20,7 +21,7 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
       },
     });
 
-    if (!item || item.inventoryId !== params.id) {
+    if (!item || item.inventoryId !== id) {
       return Response.json({ error: "Item not found" }, { status: 404 });
     }
 
@@ -32,8 +33,9 @@ export async function GET(_request: NextRequest, { params }: { params: { id: str
 }
 
 // PATCH update item
-export async function PATCH(request: NextRequest, { params }: { params: { id: string; itemId: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string; itemId: string }> }) {
   try {
+    const { id, itemId } = await params;
     const user = await getCurrentUser(request);
 
     if (!user) {
@@ -41,7 +43,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const item = await prisma.item.findUnique({
-      where: { id: params.itemId },
+      where: { id: itemId },
       include: {
         inventory: {
           select: {
@@ -52,7 +54,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
       },
     });
 
-    if (!item || item.inventoryId !== params.id) {
+    if (!item || item.inventoryId !== id) {
       return Response.json({ error: "Item not found" }, { status: 404 });
     }
 
@@ -101,7 +103,7 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const updatedItem = await prisma.item.update({
-      where: { id: params.itemId },
+      where: { id: itemId },
       data: {
         name: name || item.name,
         tags: tags !== undefined ? tags : item.tags,
@@ -131,8 +133,9 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 // DELETE item
-export async function DELETE(request: NextRequest, { params }: { params: { id: string; itemId: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string; itemId: string }> }) {
   try {
+    const { id, itemId } = await params;
     const user = await getCurrentUser(request);
 
     if (!user) {
@@ -140,7 +143,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     const item = await prisma.item.findUnique({
-      where: { id: params.itemId },
+      where: { id: itemId },
       include: {
         inventory: {
           select: {
@@ -150,7 +153,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
       },
     });
 
-    if (!item || item.inventoryId !== params.id) {
+    if (!item || item.inventoryId !== id) {
       return Response.json({ error: "Item not found" }, { status: 404 });
     }
 
@@ -162,7 +165,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     }
 
     await prisma.item.delete({
-      where: { id: params.itemId },
+      where: { id: itemId },
     });
 
     return Response.json({ message: "Item deleted successfully" });

@@ -5,19 +5,12 @@ import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
-import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
+import CustomFieldsBuilder, { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import Image from "next/image";
 
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
-
-interface CustomFieldDefinition {
-  name: string;
-  type: string;
-  label: string;
-  required: boolean;
-}
 
 export default function NewInventoryPage() {
   const { data: session } = useSession();

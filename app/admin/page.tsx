@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "@/lib/auth-client";
+import { useSession, ExtendedSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
@@ -28,19 +28,21 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
 
+  const extendedSession = session as unknown as ExtendedSession | null;
+
   // Check if user is admin
   useEffect(() => {
-    if (!isPending && (!session || session.user.role !== "admin")) {
+    if (!isPending && (!extendedSession || extendedSession.user.role !== "admin")) {
       router.push("/");
     }
-  }, [session, isPending, router]);
+  }, [extendedSession, isPending, router]);
 
   // Fetch users
   useEffect(() => {
-    if (session?.user.role === "admin") {
+    if (extendedSession?.user.role === "admin") {
       fetchUsers();
     }
-  }, [session]);
+  }, [extendedSession]);
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -72,7 +74,7 @@ export default function AdminPage() {
   };
 
   const toggleAdmin = async (userId: string) => {
-    if (userId === session?.user.id) {
+    if (userId === extendedSession?.user.id) {
       const confirmed = confirm(t("admin.confirmRemoveOwnAdmin"));
       if (!confirmed) return;
     }
@@ -148,11 +150,11 @@ export default function AdminPage() {
   };
 
   const bulkDelete = async () => {
-    const confirmed = confirm(t("admin.confirmBulkDelete", { count: selectedUsers.size }).replace("{count}", selectedUsers.size.toString()));
+    const confirmed = confirm(t("admin.confirmBulkDelete").replace("{count}", selectedUsers.size.toString()));
     if (!confirmed) return;
 
     for (const userId of selectedUsers) {
-      if (userId !== session?.user.id) {
+      if (userId !== extendedSession?.user.id) {
         await deleteUser(userId);
       }
     }
@@ -167,7 +169,7 @@ export default function AdminPage() {
     );
   }
 
-  if (!session || session.user.role !== "admin") {
+  if (!extendedSession || extendedSession.user.role !== "admin") {
     return null;
   }
 
@@ -247,7 +249,7 @@ export default function AdminPage() {
                         <button onClick={() => toggleAdmin(user.id)} className="text-sm font-medium text-blue-600 hover:text-blue-700 dark:text-blue-400">
                           {user.role === "admin" ? t("admin.actions.removeAdmin") : t("admin.actions.makeAdmin")}
                         </button>
-                        {user.id !== session.user.id && (
+                        {user.id !== extendedSession.user.id && (
                           <button onClick={() => deleteUser(user.id)} className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400">
                             {t("admin.actions.delete")}
                           </button>

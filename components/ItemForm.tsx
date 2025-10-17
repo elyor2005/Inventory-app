@@ -2,13 +2,7 @@
 
 import { useState } from "react";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-
-interface CustomFieldDefinition {
-  name: string;
-  type: string;
-  label: string;
-  required: boolean;
-}
+import { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 
 interface ItemFormProps {
   customFields: CustomFieldDefinition[];

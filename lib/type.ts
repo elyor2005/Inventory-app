@@ -4,13 +4,8 @@ export interface CustomField {
   enabled: boolean;
 }
 
-// Custom field definition with full details
-export interface CustomFieldDefinition {
-  name: string;
-  type: string;
-  label: string;
-  required: boolean;
-}
+// Custom field definition with full details - imported from CustomFieldsBuilder
+export type { CustomFieldDefinition, FieldType } from "@/components/CustomFieldsBuilder";
 
 // Custom field values for items
 export interface CustomFieldValues {

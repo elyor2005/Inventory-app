@@ -2,20 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useSession } from "@/lib/auth-client";
+import { useSession, ExtendedSession } from "@/lib/auth-client";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
-import CustomFieldsBuilder from "@/components/CustomFieldsBuilder";
+import CustomFieldsBuilder, { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
-
-interface CustomFieldDefinition {
-  name: string;
-  type: string;
-  label: string;
-  required: boolean;
-}
 
 interface Inventory {
   id: string;
@@ -173,8 +166,9 @@ export default function EditInventoryPage() {
     return null;
   }
 
+  const extendedSession = session as unknown as ExtendedSession | null;
   const isOwner = session.user.id === inventory.creator.id;
-  const isAdmin = session.user.role === "admin";
+  const isAdmin = extendedSession?.user.role === "admin";
 
   if (!isOwner && !isAdmin) {
     router.push(`/inventories/${params.id}`);
