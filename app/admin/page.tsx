@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useSession, ExtendedSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
@@ -227,7 +228,11 @@ export default function AdminPage() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          {user.image && <img src={user.image} alt={user.name || "User"} className="w-10 h-10 rounded-full" />}
+                          {user.image && (
+                            <div className="relative w-10 h-10">
+                              <Image src={user.image} alt={user.name || "User"} fill className="rounded-full object-cover" sizes="40px" />
+                            </div>
+                          )}
                           <div>
                             <div className="font-medium text-gray-900 dark:text-white">{user.name || "No name"}</div>
                             <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>

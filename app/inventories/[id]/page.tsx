@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -139,7 +140,11 @@ export default function InventoryDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  {inventory.creator.image && <img src={inventory.creator.image} alt={inventory.creator.name || "User"} className="w-6 h-6 rounded-full" />}
+                  {inventory.creator.image && (
+                    <div className="relative w-6 h-6">
+                      <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="24px" />
+                    </div>
+                  )}
                   <span>
                     {t("inventory.detail.createdBy")} {inventory.creator.name || inventory.creator.email}
                   </span>
@@ -182,8 +187,8 @@ export default function InventoryDetailPage() {
               <div className="space-y-6">
                 {/* Image */}
                 {inventory.image && (
-                  <div className="mb-6">
-                    <img src={inventory.image} alt={inventory.title} className="w-full max-h-96 object-cover rounded-lg" />
+                  <div className="mb-6 relative w-full h-96 rounded-lg overflow-hidden">
+                    <Image src={inventory.image} alt={inventory.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px" />
                   </div>
                 )}
 

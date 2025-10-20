@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -113,7 +114,11 @@ export default function InventoriesPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {inventories.map((inventory) => (
                 <div key={inventory.id} className="bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition overflow-hidden">
-                  {inventory.image && <img src={inventory.image} alt={inventory.title} className="w-full h-48 object-cover" />}
+                  {inventory.image && (
+                    <div className="relative w-full h-48">
+                      <Image src={inventory.image} alt={inventory.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" />
+                    </div>
+                  )}
                   <div className="p-6">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{inventory.title}</h3>

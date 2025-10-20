@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import LikeButton from "./LikeButton";
@@ -150,7 +151,11 @@ export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListP
                 <div className="mb-3">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">{item.name}</h3>
                   <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-                    {item.creator.image && <img src={item.creator.image} alt={item.creator.name || "User"} className="w-4 h-4 rounded-full" />}
+                    {item.creator.image && (
+                      <div className="relative w-4 h-4">
+                        <Image src={item.creator.image} alt={item.creator.name || "User"} fill className="rounded-full object-cover" sizes="16px" />
+                      </div>
+                    )}
                     <span>{item.creator.name || item.creator.email}</span>
                     <span>•</span>
                     <span>{new Date(item.createdAt).toLocaleDateString()}</span>

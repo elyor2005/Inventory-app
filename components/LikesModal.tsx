@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface Like {
@@ -76,7 +77,13 @@ export default function LikesModal({ itemId, inventoryId, isOpen, onClose }: Lik
               {likes.map((like) => (
                 <div key={like.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                   {/* Avatar */}
-                  {like.user.image ? <img src={like.user.image} alt={like.user.name || "User"} className="w-10 h-10 rounded-full" /> : <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">{(like.user.name || like.user.email)[0].toUpperCase()}</div>}
+                  {like.user.image ? (
+                    <div className="relative w-10 h-10">
+                      <Image src={like.user.image} alt={like.user.name || "User"} fill className="rounded-full object-cover" sizes="40px" />
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">{(like.user.name || like.user.email)[0].toUpperCase()}</div>
+                  )}
 
                   {/* User Info */}
                   <div className="flex-1 min-w-0">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, ChangeEvent, DragEvent } from "react";
+import Image from "next/image";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
 interface ImageUploadProps {
@@ -141,8 +142,8 @@ export default function ImageUpload({ currentImage, onImageChange, className = "
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="relative rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600">
-            <img src={preview} alt="Preview"  className="w-full h-64 object-cover" />
+          <div className="relative rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 h-64">
+            <Image src={preview} alt="Preview" fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" unoptimized={preview.startsWith('data:')} />
             {uploading && (
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
                 <div className="text-white text-center">

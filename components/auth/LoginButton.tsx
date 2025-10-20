@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { signIn, signOut, useSession } from "@/lib/auth-client";
 import { useLanguage } from "../providers/LanguageProvider";
 
@@ -16,7 +17,11 @@ export default function LoginButton() {
     return (
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
-          {session.user.image && <img src={session.user.image} alt={session.user.name || "User"} className="w-10 h-10 rounded-full border-2 border-blue-500" />}
+          {session.user.image && (
+            <div className="relative w-10 h-10">
+              <Image src={session.user.image} alt={session.user.name || "User"} fill className="rounded-full object-cover border-2 border-blue-500" sizes="40px" />
+            </div>
+          )}
           <div className="flex flex-col">
             <span className="text-sm font-semibold dark:text-white">{session.user.name}</span>
             <span className="text-xs text-gray-500 dark:text-gray-400">{session.user.email}</span>

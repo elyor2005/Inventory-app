@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useSession } from "@/lib/auth-client";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import ReactMarkdown from "react-markdown";
@@ -184,7 +185,15 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
       <div key={comment.id} className={`${isReply ? "ml-12 mt-3" : ""}`}>
         <div className="flex gap-3">
           {/* Avatar */}
-          <div className="flex-shrink-0">{comment.author.image ? <img src={comment.author.image} alt={comment.author.name || "User"} className="w-10 h-10 rounded-full" /> : <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">{(comment.author.name || comment.author.email)[0].toUpperCase()}</div>}</div>
+          <div className="flex-shrink-0">
+            {comment.author.image ? (
+              <div className="relative w-10 h-10">
+                <Image src={comment.author.image} alt={comment.author.name || "User"} fill className="rounded-full object-cover" sizes="40px" />
+              </div>
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">{(comment.author.name || comment.author.email)[0].toUpperCase()}</div>
+            )}
+          </div>
 
           {/* Comment Content */}
           <div className="flex-1 min-w-0">

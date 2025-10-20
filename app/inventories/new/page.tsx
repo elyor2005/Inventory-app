@@ -8,7 +8,6 @@ import Footer from "@/components/layout/Footer";
 import CustomFieldsBuilder, { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
-import Image from "next/image";
 import ImageUpload from "@/components/ImageUpload";
 
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];

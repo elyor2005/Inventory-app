@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import Image from "next/image";
 import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -173,7 +174,11 @@ export default function ItemDetailPage() {
                 {/* Metadata */}
                 <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                   <div className="flex items-center gap-2">
-                    {item.creator.image && <img src={item.creator.image} alt={item.creator.name || "User"} className="w-6 h-6 rounded-full" />}
+                    {item.creator.image && (
+                      <div className="relative w-6 h-6">
+                        <Image src={item.creator.image} alt={item.creator.name || "User"} fill className="rounded-full object-cover" sizes="24px" />
+                      </div>
+                    )}
                     <span>
                       {t("created_by") || "Created by"} {item.creator.name || item.creator.email}
                     </span>
