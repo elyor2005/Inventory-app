@@ -71,7 +71,6 @@ model Verification {
   @@unique([identifier, value])
 }
 
-
 model Inventory {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
@@ -97,7 +96,6 @@ model Inventory {
   @@index([creatorId])
   @@index([category])
 }
-
 
 model Item {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -157,7 +155,7 @@ model Like {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   
-  @@unique([itemId, userId]) // Prevent duplicate likes
+  @@unique([itemId, userId]) 
   @@index([itemId])
   @@index([userId])
 }

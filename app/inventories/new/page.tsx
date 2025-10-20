@@ -9,6 +9,7 @@ import CustomFieldsBuilder, { CustomFieldDefinition } from "@/components/CustomF
 import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import Image from "next/image";
+import ImageUpload from "@/components/ImageUpload";
 
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
 
@@ -144,7 +145,7 @@ export default function NewInventoryPage() {
               </div>
 
               {/* Image URL */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
                   {t("image_url") || "Image URL"} <span className="text-gray-500 text-xs">({t("optional") || "optional"})</span>
                 </label>
@@ -161,6 +162,12 @@ export default function NewInventoryPage() {
                     }}
                   />
                 )}
+              </div> */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  {t("inventory_image") || "Inventory Image"} <span className="text-gray-500 text-xs">({t("optional") || "optional"})</span>
+                </label>
+                <ImageUpload currentImage={formData.image} onImageChange={(url) => setFormData({ ...formData, image: url || "" })} />
               </div>
 
               {/* Tags */}

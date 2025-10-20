@@ -442,5 +442,16 @@
   "results_summary": "Results Summary",
   "recent_searches": "Recent Searches",
   "clear_history": "Clear History",
-  "view_all_results": "View All Results"
+  "view_all_results": "View All Results",
+  "invalid_file_type": "Invalid file type. Only JPEG, PNG, WebP, and GIF images are allowed",
+  "file_too_large": "File too large. Maximum size is 5MB",
+  "upload_error": "Failed to upload image",
+  "drag_drop_image": "Drag and drop an image here, or click to select",
+  "max_file_size": "Maximum file size: 5MB",
+  "supported_formats": "Supported formats: JPEG, PNG, WebP, GIF",
+  "uploading": "Uploading...",
+  "change_image": "Change Image",
+  "remove_image": "Remove Image",
+  "item_image": "Item Image",
+  "inventory_image": "Inventory Image"
 }

@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import CustomFieldsBuilder, { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
+import ImageUpload from "@/components/ImageUpload";
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
 
 interface Inventory {
@@ -218,7 +219,7 @@ export default function EditInventoryPage() {
               </div>
 
               {/* Image URL */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
                   {t("inventory.new.imageLabel")} <span className="text-gray-500 text-xs">{t("inventory.new.imageOptional")}</span>
                 </label>
@@ -236,6 +237,12 @@ export default function EditInventoryPage() {
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                   <CustomIdBuilder format={customIdFormat} onChange={setCustomIdFormat} />
                 </div>
+              </div> */}
+              <div>
+                <label className="block text-sm font-medium text-gray-900 dark:text-white mb-2">
+                  {t("item_image") || "Item Image"} <span className="text-gray-500 text-xs">({t("optional") || "optional"})</span>
+                </label>
+                <ImageUpload currentImage={formData.image} onImageChange={(url) => setFormData({ ...formData, image: url || "" })} />
               </div>
 
               {/* Tags */}

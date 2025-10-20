@@ -442,5 +442,16 @@
   "results_summary": "Natijalar Xulosasi",
   "recent_searches": "Oxirgi Qidiruvlar",
   "clear_history": "Tarixni Tozalash",
-  "view_all_results": "Barcha Natijalarni Ko'rish"
+  "view_all_results": "Barcha Natijalarni Ko'rish",
+  "invalid_file_type": "Noto'g'ri fayl turi. Faqat JPEG, PNG, WebP va GIF rasmlariga ruxsat berilgan",
+  "file_too_large": "Fayl juda katta. Maksimal hajmi 5MB",
+  "upload_error": "Rasmni yuklashda xatolik",
+  "drag_drop_image": "Rasmni bu yerga torting va tashlang yoki tanlash uchun bosing",
+  "max_file_size": "Maksimal fayl hajmi: 5MB",
+  "supported_formats": "Qo'llab-quvvatlanadigan formatlar: JPEG, PNG, WebP, GIF",
+  "uploading": "Yuklanmoqda...",
+  "change_image": "Rasmni O'zgartirish",
+  "remove_image": "Rasmni O'chirish",
+  "item_image": "Element Rasmi",
+  "inventory_image": "Inventar Rasmi"
 }

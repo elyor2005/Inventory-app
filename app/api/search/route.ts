@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get("q") || "";
-    const type = searchParams.get("type") || "all"; // 'all', 'inventories', 'items'
+    const type = searchParams.get("type") || "all";
     const category = searchParams.get("category") || "";
     const limit = parseInt(searchParams.get("limit") || "50");
 
@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
           title: true,
           description: true,
           category: true,
-          
+
           tags: true,
           createdAt: true,
         },
@@ -119,7 +119,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Sort by relevance (exact matches first, then by date)
+    
     results.sort((a, b) => {
       const aExact = a.name.toLowerCase() === searchTerm.toLowerCase();
       const bExact = b.name.toLowerCase() === searchTerm.toLowerCase();
