@@ -1,26 +1,32 @@
-import { NextRequest } from "next/server";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
-import { requireAdmin } from "@/lib/admin";
 
-export async function GET(request: NextRequest) {
-  // Check if user is admin
-  const unauthorized = await requireAdmin(request);
-  if (unauthorized) return unauthorized;
-
+export async function GET() {
   try {
-    // Get all users with their stats
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session?.user || session.user.role !== "admin") {
+      return Response.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
-        email: true,
         name: true,
+        email: true,
         image: true,
         role: true,
         blocked: true,
         createdAt: true,
+        updatedAt: true,
         _count: {
           select: {
-            sessions: true,
+            inventories: true,
+            items: true,
+            comments: true,
           },
         },
       },
