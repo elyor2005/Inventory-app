@@ -81,7 +81,11 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="mt-8 pt-8 border-t dark:border-gray-800 text-center text-sm text-gray-600 dark:text-gray-400">
-          <p>&copy; {currentYear} {t("footer.copyright")}</p>
+          <a href="https://dev-fattokhov.vercel.app/">
+            <p>
+              &copy; {currentYear} {t("footer.copyright")}
+            </p>
+          </a>
         </div>
       </div>
     </footer>
