@@ -11,6 +11,7 @@ import Footer from "@/components/layout/Footer";
 import ReactMarkdown from "react-markdown";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import ItemsList from "@/components/ItemsList";
+import { ItemCardSkeleton } from "@/components/LoadingSkeleton";
 
 interface Inventory {
   id: string;
@@ -88,8 +89,22 @@ export default function InventoryDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">{t("common.loading")}</div>
+      <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
+        <Header />
+        <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-8">
+          <div className="container mx-auto px-4">
+            <div className="space-y-4 mb-8 animate-pulse">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-64"></div>
+              <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-96"></div>
+            </div>
+            <div className="grid gap-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <ItemCardSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }

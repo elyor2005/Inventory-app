@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useSession } from "@/lib/auth-client";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import ReactMarkdown from "react-markdown";
 
 interface Comment {
@@ -29,6 +30,7 @@ interface CommentsSectionProps {
 export default function CommentsSection({ itemId, inventoryId }: CommentsSectionProps) {
   const { data: session } = useSession();
   const { t } = useLanguage();
+  const { showToast } = useToast();
 
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -62,7 +64,7 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
 
   const handlePostComment = async () => {
     if (!newComment.trim()) {
-      alert(t("comment_required") || "Comment cannot be empty");
+      showToast(t("comment_required") || "Comment cannot be empty", "error");
       return;
     }
 
@@ -79,11 +81,11 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
         setShowPreview(false);
         fetchComments();
       } else {
-        alert(t("error_post_comment") || "Failed to post comment");
+        showToast(t("error_post_comment") || "Failed to post comment", "error");
       }
     } catch (error) {
       console.error("Error posting comment:", error);
-      alert(t("error_post_comment") || "Failed to post comment");
+      showToast(t("error_post_comment") || "Failed to post comment", "error");
     } finally {
       setPosting(false);
     }
@@ -91,7 +93,7 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
 
   const handlePostReply = async (parentId: string) => {
     if (!replyContent.trim()) {
-      alert(t("comment_required") || "Comment cannot be empty");
+      showToast(t("comment_required") || "Comment cannot be empty", "error");
       return;
     }
 
@@ -109,11 +111,11 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
         fetchComments();
         setShowReplies((prev) => new Set(prev).add(parentId));
       } else {
-        alert(t("error_post_comment") || "Failed to post reply");
+        showToast(t("error_post_comment") || "Failed to post reply", "error");
       }
     } catch (error) {
       console.error("Error posting reply:", error);
-      alert(t("error_post_comment") || "Failed to post reply");
+      showToast(t("error_post_comment") || "Failed to post reply", "error");
     } finally {
       setPosting(false);
     }
@@ -121,7 +123,7 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
 
   const handleEditComment = async (commentId: string) => {
     if (!editContent.trim()) {
-      alert(t("comment_required") || "Comment cannot be empty");
+      showToast(t("comment_required") || "Comment cannot be empty", "error");
       return;
     }
 
@@ -137,11 +139,11 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
         setEditContent("");
         fetchComments();
       } else {
-        alert(t("error_update_comment") || "Failed to update comment");
+        showToast(t("error_update_comment") || "Failed to update comment", "error");
       }
     } catch (error) {
       console.error("Error updating comment:", error);
-      alert(t("error_update_comment") || "Failed to update comment");
+      showToast(t("error_update_comment") || "Failed to update comment", "error");
     }
   };
 
@@ -158,11 +160,11 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
       if (response.ok) {
         fetchComments();
       } else {
-        alert(t("error_delete_comment") || "Failed to delete comment");
+        showToast(t("error_delete_comment") || "Failed to delete comment", "error");
       }
     } catch (error) {
       console.error("Error deleting comment:", error);
-      alert(t("error_delete_comment") || "Failed to delete comment");
+      showToast(t("error_delete_comment") || "Failed to delete comment", "error");
     }
   };
 
@@ -298,8 +300,22 @@ export default function CommentsSection({ itemId, inventoryId }: CommentsSection
 
   if (loading) {
     return (
-      <div className="text-center py-8">
-        <div className="text-gray-600 dark:text-gray-400">{t("loading_comments") || "Loading comments..."}</div>
+      <div className="space-y-4">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 animate-pulse">
+            <div className="flex gap-3 mb-3">
+              <div className="w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+              <div className="flex-1 space-y-2">
+                <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-32"></div>
+                <div className="h-3 bg-gray-300 dark:bg-gray-700 rounded w-24"></div>
+              </div>
+            </div>
+            <div className="space-y-2 ml-13">
+              <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-full"></div>
+              <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4"></div>
+            </div>
+          </div>
+        ))}
       </div>
     );
   }

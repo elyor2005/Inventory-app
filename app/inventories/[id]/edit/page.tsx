@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import CustomFieldsBuilder, { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
 import ImageUpload from "@/components/ImageUpload";
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
@@ -31,6 +32,7 @@ export default function EditInventoryPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { t } = useLanguage();
+  const { showToast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -104,7 +106,7 @@ export default function EditInventoryPage() {
     // Validate custom fields have labels
     const invalidFields = customFields.filter((f) => !f.label.trim());
     if (invalidFields.length > 0) {
-      alert(t("inventory.new.customFieldsError"));
+      showToast(t("inventory.new.customFieldsError"), "error");
       return;
     }
 
@@ -124,15 +126,15 @@ export default function EditInventoryPage() {
       if (response.ok) {
         router.push(`/inventories/${params.id}`);
       } else if (response.status === 409) {
-        alert(t("edit.conflictError"));
+        showToast(t("edit.conflictError"), "error");
         fetchInventory();
       } else {
         const error = await response.json();
-        alert(error.error || t("edit.updateError"));
+        showToast(error.error || t("edit.updateError"), "error");
       }
     } catch (error) {
       console.error("Error updating inventory:", error);
-      alert(t("edit.updateError"));
+      showToast(t("edit.updateError"), "error");
     } finally {
       setSaving(false);
     }

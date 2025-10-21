@@ -9,6 +9,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import CommentsSection from "@/components/CommentsSection";
 import LikeButton from "@/components/LikeButton";
 import LikesModal from "@/components/LikesModal";
@@ -45,6 +46,7 @@ export default function ItemDetailPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { t } = useLanguage();
+  const { showToast } = useToast();
 
   const [item, setItem] = useState<Item | null>(null);
   const [inventory, setInventory] = useState<Inventory | null>(null);
@@ -102,18 +104,32 @@ export default function ItemDetailPage() {
       if (response.ok) {
         router.push(`/inventories/${params.id}`);
       } else {
-        alert(t("error_delete_item") || "Failed to delete item");
+        showToast(t("error_delete_item") || "Failed to delete item", "error");
       }
     } catch (error) {
       console.error("Error deleting item:", error);
-      alert(t("error_delete_item") || "Failed to delete item");
+      showToast(t("error_delete_item") || "Failed to delete item", "error");
     }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">{t("loading") || "Loading..."}</div>
+      <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
+        <Header />
+        <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-8">
+          <div className="container mx-auto px-4 max-w-4xl">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 space-y-6 animate-pulse">
+              <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
+              <div className="space-y-4">
+                <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-2/3"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }

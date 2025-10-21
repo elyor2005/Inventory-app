@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "@/lib/auth-client";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 
 interface LikeButtonProps {
   itemId: string;
@@ -15,6 +16,7 @@ interface LikeButtonProps {
 export default function LikeButton({ itemId, inventoryId, initialLikes = 0, initialLiked = false, showCount = true }: LikeButtonProps) {
   const { data: session } = useSession();
   const { t } = useLanguage();
+  const { showToast } = useToast();
 
   const [likes, setLikes] = useState(initialLikes);
   const [isLiked, setIsLiked] = useState(initialLiked);
@@ -41,7 +43,7 @@ export default function LikeButton({ itemId, inventoryId, initialLikes = 0, init
 
   const handleLike = async () => {
     if (!session) {
-      alert(t("login_required") || "Please log in to like items");
+      showToast(t("login_required") || "Please log in to like items", "info");
       return;
     }
 
@@ -56,11 +58,11 @@ export default function LikeButton({ itemId, inventoryId, initialLikes = 0, init
         setIsLiked(!isLiked);
         setLikes(isLiked ? likes - 1 : likes + 1);
       } else {
-        alert(isLiked ? t("error_unlike") || "Failed to unlike" : t("error_like") || "Failed to like");
+        showToast(isLiked ? t("error_unlike") || "Failed to unlike" : t("error_like") || "Failed to like", "error");
       }
     } catch (error) {
       console.error("Error toggling like:", error);
-      alert(isLiked ? t("error_unlike") || "Failed to unlike" : t("error_like") || "Failed to like");
+      showToast(isLiked ? t("error_unlike") || "Failed to unlike" : t("error_like") || "Failed to like", "error");
     } finally {
       setIsLoading(false);
     }

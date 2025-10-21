@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import ItemForm from "@/components/ItemForm";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import Link from "next/link";
 import { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 
@@ -35,6 +36,7 @@ export default function NewItemPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const { t } = useLanguage();
+  const { showToast } = useToast();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -86,7 +88,7 @@ export default function NewItemPage() {
       const missingFields = requiredFields.filter((f) => !customFieldValues[f.name] || customFieldValues[f.name] === "");
 
       if (missingFields.length > 0) {
-        alert(`${t("error_required_fields") || "Please fill in all required fields"}: ${missingFields.map((f) => f.label).join(", ")}`);
+        showToast(`${t("error_required_fields") || "Please fill in all required fields"}: ${missingFields.map((f) => f.label).join(", ")}`, "error");
         return;
       }
     }
@@ -110,11 +112,11 @@ export default function NewItemPage() {
         router.refresh();
       } else {
         const error = await response.json();
-        alert(error.error || t("error_create_item") || "Failed to create item");
+        showToast(error.error || t("error_create_item") || "Failed to create item", "error");
       }
     } catch (error) {
       console.error("Error creating item:", error);
-      alert(t("error_create_item") || "Failed to create item");
+      showToast(t("error_create_item") || "Failed to create item", "error");
     } finally {
       setSaving(false);
     }
@@ -139,8 +141,21 @@ export default function NewItemPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">{t("common.loading") || "Loading..."}</div>
+      <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
+        <Header />
+        <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-8">
+          <div className="container mx-auto px-4 max-w-3xl">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-6 animate-pulse">
+              <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-48"></div>
+              <div className="space-y-4">
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-10 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-32 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }

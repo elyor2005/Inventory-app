@@ -9,6 +9,7 @@ import CustomFieldsBuilder, { CustomFieldDefinition } from "@/components/CustomF
 import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import ImageUpload from "@/components/ImageUpload";
+import { useToast } from "@/components/providers/ToastProvider";
 
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
 
@@ -16,6 +17,7 @@ export default function NewInventoryPage() {
   const { data: session } = useSession();
   const router = useRouter();
   const { t } = useLanguage();
+  const { showToast } = useToast();
 
   const [loading, setLoading] = useState(false);
   const [customFields, setCustomFields] = useState<CustomFieldDefinition[]>([]);
@@ -43,7 +45,7 @@ export default function NewInventoryPage() {
     // Validate custom fields have labels
     const invalidFields = customFields.filter((f) => !f.label.trim());
     if (invalidFields.length > 0) {
-      alert(t("error_empty_field_labels") || "Please provide labels for all custom fields");
+      showToast(t("error_empty_field_labels") || "Please provide labels for all custom fields", "error");
       return;
     }
 
@@ -65,11 +67,11 @@ export default function NewInventoryPage() {
         router.push(`/inventories/${data.inventory.id}`);
       } else {
         const error = await response.json();
-        alert(error.error || t("error_create_inventory") || "Failed to create inventory");
+        showToast(error.error || t("error_create_inventory") || "Failed to create inventory", "error");
       }
     } catch (error) {
       console.error("Error creating inventory:", error);
-      alert(t("error_create_inventory") || "Failed to create inventory");
+      showToast(t("error_create_inventory") || "Failed to create inventory", "error");
     } finally {
       setLoading(false);
     }

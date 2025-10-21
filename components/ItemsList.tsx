@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { useToast } from "@/components/providers/ToastProvider";
 import LikeButton from "./LikeButton";
+import { ItemCardSkeleton } from "./LoadingSkeleton";
 interface Item {
   id: string;
   name: string;
@@ -27,6 +29,7 @@ interface ItemsListProps {
 
 export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListProps) {
   const { t } = useLanguage();
+  const { showToast } = useToast();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,13 +67,13 @@ export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListP
 
       if (response.ok) {
         setItems(items.filter((item) => item.id !== itemId));
-        alert(t("item_deleted") || "Item deleted successfully");
+        showToast(t("item_deleted") || "Item deleted successfully", "success");
       } else {
-        alert(t("error_delete_item") || "Failed to delete item");
+        showToast(t("error_delete_item") || "Failed to delete item", "error");
       }
     } catch (error) {
       console.error("Error deleting item:", error);
-      alert(t("error_delete_item") || "Failed to delete item");
+      showToast(t("error_delete_item") || "Failed to delete item", "error");
     }
   };
 
@@ -86,8 +89,10 @@ export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListP
 
   if (loading) {
     return (
-      <div className="text-center py-12">
-        <div className="text-lg text-gray-600 dark:text-gray-400">{t("common.loading") || "Loading..."}</div>
+      <div className="space-y-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <ItemCardSkeleton key={i} />
+        ))}
       </div>
     );
   }

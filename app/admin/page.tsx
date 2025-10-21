@@ -6,7 +6,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import Image from "next/image";
-
+import { useToast } from '@/components/providers/ToastProvider';
+import { TableSkeleton } from "@/components/LoadingSkeleton";
 interface User {
   id: string;
   name: string;
@@ -25,6 +26,7 @@ interface User {
 export default function AdminDashboard() {
   const { t } = useLanguage();
   const router = useRouter();
+  const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -75,10 +77,10 @@ export default function AdminDashboard() {
         makeAdmin: t("user_role_updated"),
         removeAdmin: t("user_role_updated"),
       };
-      alert(actionMessages[action] || "Action completed");
+      showToast(actionMessages[action] || "Action completed", "success");
     } catch (error) {
       console.error("Error updating user:", error);
-      alert(t("error_update_user"));
+      showToast(t("error_update_user"), "error");
     } finally {
       setActionLoading(null);
     }
@@ -135,9 +137,8 @@ export default function AdminDashboard() {
             </div>
 
             {loading ? (
-              <div className="p-8 text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="mt-4 text-gray-600 dark:text-gray-400">{t("loading")}</p>
+              <div className="p-6">
+                <TableSkeleton rows={8} />
               </div>
             ) : (
               <div className="overflow-x-auto">

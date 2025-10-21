@@ -8,6 +8,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { InventoryCardSkeleton } from "@/components/LoadingSkeleton";
 
 interface Inventory {
   id: string;
@@ -77,8 +78,19 @@ export default function InventoriesPage() {
 
   if (isPending || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">{t("common.loading")}</div>
+      <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
+        <Header />
+        <main className="flex-1 bg-gray-50 dark:bg-gray-900 py-8">
+          <div className="container mx-auto px-4">
+            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded w-64 mb-8 animate-pulse"></div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <InventoryCardSkeleton key={i} />
+              ))}
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }

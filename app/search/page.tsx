@@ -6,6 +6,7 @@ import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
+import { InventoryCardSkeleton, ItemCardSkeleton } from "@/components/LoadingSkeleton";
 
 interface SearchResult {
   type: "inventory" | "item";
@@ -134,9 +135,23 @@ function SearchPageContent() {
             {/* Results */}
             <div className="flex-1">
               {loading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600 dark:text-gray-400">{t("searching") || "Searching..."}</p>
+                <div className="space-y-6">
+                  <div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4 animate-pulse"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {Array.from({ length: 2 }).map((_, i) => (
+                        <InventoryCardSkeleton key={i} />
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-48 mb-4 animate-pulse"></div>
+                    <div className="space-y-4">
+                      {Array.from({ length: 3 }).map((_, i) => (
+                        <ItemCardSkeleton key={i} />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               ) : results.length === 0 ? (
                 <div className="text-center py-12">
