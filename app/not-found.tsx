@@ -19,7 +19,7 @@ export default function NotFound() {
           {/* Text */}
           <h1 className="text-6xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
           <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-4">Page Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">The page you're looking for doesn't exist or has been moved.</p>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">The page you&apos;re looking for doesn&apos;t exist or has been moved.</p>
 
           {/* Actions */}
           <div className="flex gap-4 justify-center">
