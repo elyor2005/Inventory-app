@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { NextRequest } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get all public inventories and their tags
     const inventories = await prisma.inventory.findMany({

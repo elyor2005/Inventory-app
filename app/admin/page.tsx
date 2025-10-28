@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
@@ -33,12 +33,7 @@ export default function AdminDashboard() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    fetchCurrentUser();
-    fetchUsers();
-  }, []);
-
-  const fetchCurrentUser = async () => {
+  const fetchCurrentUser = useCallback(async () => {
     try {
       const response = await fetch("/api/user/me");
       if (response.ok) {
@@ -48,9 +43,9 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error("Error fetching current user:", error);
     }
-  };
+  }, []);
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await fetch("/api/admin/users");
       if (!response.ok) {
@@ -67,7 +62,12 @@ export default function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [router]);
+
+  useEffect(() => {
+    fetchCurrentUser();
+    fetchUsers();
+  }, [fetchCurrentUser, fetchUsers]);
 
   const handleSelectUser = (userId: string) => {
     const newSelected = new Set(selectedUsers);
@@ -283,7 +283,6 @@ export default function AdminDashboard() {
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                     {users.map((user) => {
                       const isCurrentUser = user.id === currentUserId;
-                      const isOtherAdmin = user.role === "admin" && !isCurrentUser;
                       return (
                       <tr key={user.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isCurrentUser ? "bg-blue-50 dark:bg-blue-900/10" : ""}`}>
                         <td className="px-4 py-4">

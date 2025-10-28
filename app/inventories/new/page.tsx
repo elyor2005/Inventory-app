@@ -23,11 +23,9 @@ export default function NewInventoryPage() {
   const [customFields, setCustomFields] = useState<CustomFieldDefinition[]>([]);
   const [customIdFormat, setCustomIdFormat] = useState<CustomIdFormat>({
     enabled: false,
-    prefix: "",
-    suffix: "",
-    counterStart: 1,
-    counterPadding: 3,
-    currentCounter: 1,
+    elements: [],
+    separator: "",
+    sequenceCounter: 1,
   });
   const [formData, setFormData] = useState({
     title: "",

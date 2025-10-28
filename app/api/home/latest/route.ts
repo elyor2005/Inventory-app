@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { NextRequest } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get latest 10 inventories that are public or accessible
     const inventories = await prisma.inventory.findMany({
