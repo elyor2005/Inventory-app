@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
@@ -48,11 +48,7 @@ export default function ExplorePage() {
     totalPages: 0,
   });
 
-  useEffect(() => {
-    fetchInventories();
-  }, [category, search, pagination.page]);
-
-  const fetchInventories = async () => {
+  const fetchInventories = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -79,7 +75,11 @@ export default function ExplorePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [category, search, pagination.page, pagination.limit]);
+
+  useEffect(() => {
+    fetchInventories();
+  }, [fetchInventories]);
 
   const handleSearch = () => {
     setSearch(searchInput);

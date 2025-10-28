@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 
@@ -27,13 +27,7 @@ export default function LikesModal({ itemId, inventoryId, isOpen, onClose }: Lik
   const [likes, setLikes] = useState<Like[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (isOpen) {
-      fetchLikes();
-    }
-  }, [isOpen, itemId]);
-
-  const fetchLikes = async () => {
+  const fetchLikes = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/inventories/${inventoryId}/items/${itemId}/likes`);
@@ -46,7 +40,13 @@ export default function LikesModal({ itemId, inventoryId, isOpen, onClose }: Lik
     } finally {
       setLoading(false);
     }
-  };
+  }, [inventoryId, itemId]);
+
+  useEffect(() => {
+    if (isOpen) {
+      fetchLikes();
+    }
+  }, [isOpen, fetchLikes]);
 
   if (!isOpen) return null;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/Header";
@@ -32,13 +32,9 @@ function SearchPageContent() {
   const [searchType, setSearchType] = useState<"all" | "inventories" | "items">("all");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
 
-  useEffect(() => {
-    if (query) {
-      performSearch();
-    }
-  }, [query, searchType, selectedCategory]);
+  const performSearch = useCallback(async () => {
+    if (!query) return;
 
-  const performSearch = async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams({
@@ -57,7 +53,13 @@ function SearchPageContent() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [query, searchType, selectedCategory]);
+
+  useEffect(() => {
+    if (query) {
+      performSearch();
+    }
+  }, [performSearch, query]);
 
   const clearFilters = () => {
     setSearchType("all");

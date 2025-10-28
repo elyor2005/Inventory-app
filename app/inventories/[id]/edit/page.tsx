@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession, ExtendedSession } from "@/lib/auth-client";
 import Header from "@/components/Header";
@@ -8,7 +8,7 @@ import Footer from "@/components/layout/Footer";
 import CustomFieldsBuilder, { CustomFieldDefinition } from "@/components/CustomFieldsBuilder";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
-import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
+import { CustomIdFormat } from "@/components/CustomIdBuilder";
 import ImageUpload from "@/components/ImageUpload";
 import { useAutoSave } from "@/hooks/useAutoSave";
 import SaveStatusIndicator from "@/components/SaveStatusIndicator";
@@ -106,11 +106,7 @@ export default function EditInventoryPage() {
     enabled: !loading && !!inventory, // Only enable after inventory is loaded
   });
 
-  useEffect(() => {
-    fetchInventory();
-  }, [params.id]);
-
-  const fetchInventory = async () => {
+  const fetchInventory = useCallback(async () => {
     setLoading(true);
     try {
       const response = await fetch(`/api/inventories/${params.id}`);
@@ -164,7 +160,11 @@ export default function EditInventoryPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [params.id, router]);
+
+  useEffect(() => {
+    fetchInventory();
+  }, [fetchInventory]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

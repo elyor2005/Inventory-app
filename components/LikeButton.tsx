@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSession } from "@/lib/auth-client";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
@@ -22,13 +22,7 @@ export default function LikeButton({ itemId, inventoryId, initialLikes = 0, init
   const [isLiked, setIsLiked] = useState(initialLiked);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    if (session) {
-      checkLikeStatus();
-    }
-  }, [session, itemId]);
-
-  const checkLikeStatus = async () => {
+  const checkLikeStatus = useCallback(async () => {
     try {
       const response = await fetch(`/api/inventories/${inventoryId}/items/${itemId}/likes/check`);
       if (response.ok) {
@@ -39,7 +33,13 @@ export default function LikeButton({ itemId, inventoryId, initialLikes = 0, init
     } catch (error) {
       console.error("Error checking like status:", error);
     }
-  };
+  }, [inventoryId, itemId]);
+
+  useEffect(() => {
+    if (session) {
+      checkLikeStatus();
+    }
+  }, [session, checkLikeStatus]);
 
   const handleLike = async () => {
     if (!session) {

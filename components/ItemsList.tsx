@@ -58,28 +58,6 @@ export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListP
     }
   };
 
-  const deleteItem = async (itemId: string) => {
-    if (!confirm(t("delete_item_confirm") || "Are you sure you want to delete this item?")) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/inventories/${inventoryId}/items/${itemId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        setItems(items.filter((item) => item.id !== itemId));
-        showToast(t("item_deleted") || "Item deleted successfully", "success");
-      } else {
-        showToast(t("error_delete_item") || "Failed to delete item", "error");
-      }
-    } catch (error) {
-      console.error("Error deleting item:", error);
-      showToast(t("error_delete_item") || "Failed to delete item", "error");
-    }
-  };
-
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedItems(new Set());

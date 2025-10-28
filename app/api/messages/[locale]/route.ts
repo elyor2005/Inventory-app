@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import enMessages from "@/messages/en.json";
 import uzMessages from "@/messages/uz.json";
 
-const messages: Record<string, any> = {
+const messages: Record<string, typeof enMessages> = {
   en: enMessages,
   uz: uzMessages,
 };
