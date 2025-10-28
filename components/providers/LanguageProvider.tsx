@@ -15,18 +15,30 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children, initialLocale = defaultLocale }: { children: React.ReactNode; initialLocale?: Locale }) {
   const [locale, setLocaleState] = useState<Locale>(initialLocale);
   const [messages, setMessages] = useState<Record<string, any>>({});
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     // Load saved language from localStorage
     const saved = localStorage.getItem("locale") as Locale;
-    if (saved) {
+    if (saved && (saved === "en" || saved === "uz")) {
       setLocaleState(saved);
     }
   }, []);
 
   useEffect(() => {
     // Load messages for current locale
-    import(`@/messages/${locale}.json`).then((m) => setMessages(m.default));
+    const loadMessages = async () => {
+      try {
+        const loadedMessages = await import(`@/messages/${locale}.json`);
+        setMessages(loadedMessages.default || loadedMessages);
+        setIsReady(true);
+      } catch (error) {
+        console.error(`Failed to load messages for locale: ${locale}`, error);
+        setIsReady(true);
+      }
+    };
+
+    loadMessages();
     // Save to localStorage
     localStorage.setItem("locale", locale);
   }, [locale]);
@@ -36,15 +48,30 @@ export function LanguageProvider({ children, initialLocale = defaultLocale }: { 
   };
 
   const t = (key: string): string => {
+    if (!isReady || !key) return key;
+
     const keys = key.split(".");
     let value: any = messages;
 
     for (const k of keys) {
       value = value?.[k];
+      if (value === undefined) {
+        return key;
+      }
     }
 
-    return value || key;
+    // Return the key if we ended up with an object or null
+    if (typeof value === "object" || value === null) {
+      return key;
+    }
+
+    return String(value);
   };
+
+  // Don't render children until messages are loaded to prevent flash of untranslated content
+  if (!isReady) {
+    return null;
+  }
 
   return <LanguageContext.Provider value={{ locale, setLocale, t }}>{children}</LanguageContext.Provider>;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useSession, ExtendedSession } from "@/lib/auth-client";
 import Header from "@/components/Header";
@@ -10,6 +10,8 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import CustomIdBuilder, { CustomIdFormat } from "@/components/CustomIdBuilder";
 import ImageUpload from "@/components/ImageUpload";
+import { useAutoSave } from "@/hooks/useAutoSave";
+import SaveStatusIndicator from "@/components/SaveStatusIndicator";
 const CATEGORIES = ["Equipment", "Furniture", "Books", "Documents", "Electronics", "Other"];
 
 interface Inventory {
@@ -50,11 +52,58 @@ export default function EditInventoryPage() {
   const [tagInput, setTagInput] = useState("");
   const [customIdFormat, setCustomIdFormat] = useState<CustomIdFormat>({
     enabled: false,
-    prefix: "",
-    suffix: "",
-    counterStart: 1,
-    counterPadding: 3,
-    currentCounter: 1,
+    elements: [],
+    separator: "",
+    sequenceCounter: 1,
+  });
+
+  // Combined data for auto-save
+  const autoSaveData = useMemo(
+    () => ({
+      ...formData,
+      customFields,
+      customIdFormat,
+    }),
+    [formData, customFields, customIdFormat]
+  );
+
+  // Auto-save hook
+  const { saveStatus, lastSaved, hasUnsavedChanges, saveNow } = useAutoSave({
+    data: autoSaveData,
+    onSave: async (data) => {
+      // Validate custom fields have labels
+      const invalidFields = data.customFields.filter((f: CustomFieldDefinition) => !f.label.trim());
+      if (invalidFields.length > 0) {
+        return { success: false, error: "Invalid custom fields" };
+      }
+
+      try {
+        const response = await fetch(`/api/inventories/${params.id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          // Update version after successful save
+          setFormData((prev) => ({ ...prev, version: result.inventory.version }));
+          return { success: true };
+        } else if (response.status === 409) {
+          showToast(t("edit.conflictError"), "error");
+          fetchInventory();
+          return { success: false, isConflict: true };
+        } else {
+          const error = await response.json();
+          return { success: false, error: error.error };
+        }
+      } catch (error) {
+        console.error("Auto-save error:", error);
+        return { success: false, error: "Network error" };
+      }
+    },
+    interval: 8000, // 8 seconds
+    enabled: !loading && !!inventory, // Only enable after inventory is loaded
   });
 
   useEffect(() => {
@@ -79,16 +128,33 @@ export default function EditInventoryPage() {
         });
         // Set custom fields
         setCustomFields(data.inventory.customFields || []);
-        setCustomIdFormat(
-          data.inventory.customIdFormat || {
-            enabled: false,
-            prefix: "",
-            suffix: "",
-            counterStart: 1,
-            counterPadding: 3,
-            currentCounter: 1,
+
+        // Handle custom ID format (support old and new formats)
+        const rawFormat = data.inventory.customIdFormat;
+        if (rawFormat && rawFormat.enabled && !rawFormat.elements) {
+          // Old format - convert to new format
+          const elements = [];
+          if (rawFormat.prefix) {
+            elements.push({ id: `text-prefix-${Date.now()}`, type: "text" as const, value: rawFormat.prefix });
           }
-        );
+          elements.push({ id: `seq-${Date.now()}`, type: "sequence" as const, padding: rawFormat.counterPadding || 3 });
+          if (rawFormat.suffix) {
+            elements.push({ id: `text-suffix-${Date.now()}`, type: "text" as const, value: rawFormat.suffix });
+          }
+          setCustomIdFormat({
+            enabled: true,
+            elements,
+            separator: "",
+            sequenceCounter: rawFormat.currentCounter || rawFormat.counterStart || 1,
+          });
+        } else {
+          setCustomIdFormat(rawFormat || {
+            enabled: false,
+            elements: [],
+            separator: "",
+            sequenceCounter: 1,
+          });
+        }
       } else {
         router.push("/inventories");
       }
@@ -113,27 +179,16 @@ export default function EditInventoryPage() {
     setSaving(true);
 
     try {
-      const response = await fetch(`/api/inventories/${params.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          customFields: customFields,
-          customIdFormat: customIdFormat,
-        }),
-      });
+      // Use the manual save function from auto-save hook
+      await saveNow();
 
-      if (response.ok) {
+      // Navigate back to detail page after successful save
+      // We check if there are no unsaved changes to know if save succeeded
+      if (!hasUnsavedChanges && saveStatus !== "error" && saveStatus !== "conflict") {
         router.push(`/inventories/${params.id}`);
-      } else if (response.status === 409) {
-        showToast(t("edit.conflictError"), "error");
-        fetchInventory();
-      } else {
-        const error = await response.json();
-        showToast(error.error || t("edit.updateError"), "error");
       }
     } catch (error) {
-      console.error("Error updating inventory:", error);
+      console.error("Error saving inventory:", error);
       showToast(t("edit.updateError"), "error");
     } finally {
       setSaving(false);
@@ -299,13 +354,21 @@ export default function EditInventoryPage() {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-4 sticky bottom-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-              <button type="button" onClick={() => router.back()} className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition">
-                {t("common.cancel")}
-              </button>
-              <button type="submit" disabled={saving} className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium transition">
-                {saving ? t("edit.saving") : t("edit.saveChanges")}
-              </button>
+            <div className="flex flex-col gap-3 sticky bottom-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
+              {/* Save Status Indicator */}
+              <div className="flex justify-center">
+                <SaveStatusIndicator status={saveStatus} lastSaved={lastSaved} hasUnsavedChanges={hasUnsavedChanges} />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4">
+                <button type="button" onClick={() => router.back()} className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition">
+                  {t("common.cancel")}
+                </button>
+                <button type="submit" disabled={saving} className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium transition">
+                  {saving ? t("edit.saving") : t("edit.saveChanges")}
+                </button>
+              </div>
             </div>
           </form>
         </div>

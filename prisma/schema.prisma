@@ -19,12 +19,13 @@ model User {
   updatedAt     DateTime  @updatedAt
 
   
-  sessions       Session[]
-  accounts       Account[]
-  inventories    Inventory[] 
-  items          Item[]
-  comments       Comment[]
-  likes          Like[]  
+  sessions          Session[]
+  accounts          Account[]
+  inventories       Inventory[]
+  items             Item[]
+  comments          Comment[]
+  inventoryComments InventoryComment[]
+  likes             Like[]
 }
 
 model Session {
@@ -83,9 +84,10 @@ model Inventory {
   creatorId   String   @db.ObjectId
   creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
-   items       Item[]
-  
-  tags         String[]
+  items       Item[]
+  discussions InventoryComment[]
+
+  tags        String[]
   customFields Json     @default("[]")
   customIdFormat Json   @default("[]")
   allowedUsers String[] @db.ObjectId
@@ -102,26 +104,28 @@ model Item {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   tags        String[]
-  
+  customId    String?  // Generated custom ID for the item (e.g., "ITEM-001")
 
-  integerValues Json?  
-  stringValues  Json?  
-  textValues    Json?  
-  booleanValues Json?  
-  dateValues    Json?  
-  
+
+  integerValues Json?
+  stringValues  Json?
+  textValues    Json?
+  booleanValues Json?
+  dateValues    Json?
+
   inventoryId String   @db.ObjectId
   inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
-  
+
   creatorId   String   @db.ObjectId
   creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
 
-  comments    Comment[] 
+  comments    Comment[]
   likes       Like[]
-  
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  @@unique([inventoryId, customId])
   @@index([inventoryId])
   @@index([creatorId])
   @@index([tags])
@@ -134,18 +138,12 @@ model Comment {
   item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
   authorId  String   @db.ObjectId
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  
- 
-  parentId  String?  @db.ObjectId
-  parent    Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  replies   Comment[] @relation("CommentReplies")
-  
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  
+
   @@index([itemId])
   @@index([authorId])
-  @@index([parentId])
 }
 
 model Like {
@@ -155,8 +153,23 @@ model Like {
   userId    String   @db.ObjectId
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  
-  @@unique([itemId, userId]) 
+
+  @@unique([itemId, userId])
   @@index([itemId])
   @@index([userId])
+}
+
+model InventoryComment {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  content     String
+  inventoryId String    @db.ObjectId
+  inventory   Inventory @relation(fields: [inventoryId], references: [id], onDelete: Cascade)
+  authorId    String    @db.ObjectId
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([inventoryId])
+  @@index([authorId])
 }

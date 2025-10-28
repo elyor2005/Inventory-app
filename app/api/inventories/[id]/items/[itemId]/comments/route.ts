@@ -9,7 +9,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const comments = await prisma.comment.findMany({
       where: {
         itemId: itemId,
-        parentId: null, // Only get top-level comments
       },
       include: {
         author: {
@@ -20,24 +19,9 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
             image: true,
           },
         },
-        replies: {
-          include: {
-            author: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                image: true,
-              },
-            },
-          },
-          orderBy: {
-            createdAt: "asc",
-          },
-        },
       },
       orderBy: {
-        createdAt: "desc",
+        createdAt: "asc", // Linear order - oldest first
       },
     });
 
@@ -59,7 +43,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     const body = await request.json();
-    const { content, parentId } = body;
+    const { content } = body;
 
     if (!content || !content.trim()) {
       return Response.json({ error: "Content is required" }, { status: 400 });
@@ -74,23 +58,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return Response.json({ error: "Item not found" }, { status: 404 });
     }
 
-    // If replying to a comment, verify parent exists
-    if (parentId) {
-      const parent = await prisma.comment.findUnique({
-        where: { id: parentId },
-      });
-
-      if (!parent || parent.itemId !== itemId) {
-        return Response.json({ error: "Parent comment not found" }, { status: 404 });
-      }
-    }
-
     const comment = await prisma.comment.create({
       data: {
         content: content.trim(),
         itemId: itemId,
         authorId: user.id,
-        parentId: parentId || null,
       },
       include: {
         author: {

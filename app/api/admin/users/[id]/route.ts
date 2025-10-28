@@ -17,9 +17,29 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = await request.json();
     const { action } = body; // 'block', 'unblock', 'makeAdmin', 'removeAdmin'
 
-    // Prevent admin from blocking/demoting themselves
+    // Prevent admin from blocking/unblocking themselves, but allow removing their own admin role
     if (userId === session.user.id) {
-      return Response.json({ error: "Cannot modify your own account" }, { status: 400 });
+      if (action === "block" || action === "unblock" || action === "makeAdmin") {
+        return Response.json({ error: "Cannot block/unblock or promote yourself" }, { status: 400 });
+      }
+      // Allow 'removeAdmin' for self
+    }
+
+    // Get target user to check their role
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true, blocked: true },
+    });
+
+    if (!targetUser) {
+      return Response.json({ error: "User not found" }, { status: 404 });
+    }
+
+    // Prevent blocking or demoting other admins (only they can remove their own admin role)
+    if (targetUser.role === "admin" && userId !== session.user.id) {
+      if (action === "block" || action === "removeAdmin") {
+        return Response.json({ error: "Cannot block or demote other admins. Only admins can remove their own admin role." }, { status: 400 });
+      }
     }
 
     let updateData: { blocked?: boolean; role?: string } = {};

@@ -24,6 +24,11 @@ export async function getCurrentUser(request: Request) {
       },
     });
 
+    // Return null if user is blocked, preventing any API access
+    if (user?.blocked) {
+      return null;
+    }
+
     return user;
   } catch (error) {
     console.error("Error getting current user:", error);
@@ -33,7 +38,8 @@ export async function getCurrentUser(request: Request) {
 
 export async function isAdmin(request: Request): Promise<boolean> {
   const user = await getCurrentUser(request);
-  return user?.role === "admin" && !user.blocked;
+  // No need to check blocked again as getCurrentUser already filters blocked users
+  return user?.role === "admin";
 }
 
 export async function requireAdmin(request: Request) {

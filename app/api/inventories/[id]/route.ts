@@ -42,7 +42,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const body = await request.json();
-    const { title, description, category, image, tags, isPublic, customFields, customIdFormat, version } = body;
+    const { title, description, category, image, tags, isPublic, customFields, customIdFormat, allowedUsers, version } = body;
 
     // Get existing inventory
     const existing = await prisma.inventory.findUnique({
@@ -93,7 +93,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         isPublic: isPublic !== undefined ? isPublic : existing.isPublic,
         tags: tags || existing.tags,
         customFields: customFields || existing.customFields,
-        customIdFormat: customIdFormat || existing.customIdFormat, // ADD THIS LINE
+        customIdFormat: customIdFormat || existing.customIdFormat,
+        allowedUsers: allowedUsers !== undefined ? allowedUsers : existing.allowedUsers,
         version: { increment: 1 },
       },
       include: {

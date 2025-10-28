@@ -47,19 +47,38 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const idFormat = inventory.customIdFormat as any;
 
     if (idFormat && idFormat.enabled) {
-      const counter = (idFormat.currentCounter || idFormat.counterStart).toString().padStart(idFormat.counterPadding, "0");
-      customId = `${idFormat.prefix}${counter}${idFormat.suffix}`;
+      // Use new ID generation system if elements exist
+      if (idFormat.elements && idFormat.elements.length > 0) {
+        const { generateCustomId, hasSequenceElement } = await import("@/lib/customIdGenerator");
+        customId = generateCustomId(idFormat);
 
-      // Update counter in inventory
-      await prisma.inventory.update({
-        where: { id },
-        data: {
-          customIdFormat: {
-            ...idFormat,
-            currentCounter: (idFormat.currentCounter || idFormat.counterStart) + 1,
+        // Update sequence counter if format uses sequence
+        if (hasSequenceElement(idFormat)) {
+          await prisma.inventory.update({
+            where: { id },
+            data: {
+              customIdFormat: {
+                ...idFormat,
+                sequenceCounter: (idFormat.sequenceCounter || 1) + 1,
+              },
+            },
+          });
+        }
+      } else {
+        // Fallback to old format for backwards compatibility
+        const counter = (idFormat.currentCounter || idFormat.counterStart || 1).toString().padStart(idFormat.counterPadding || 3, "0");
+        customId = `${idFormat.prefix || ""}${counter}${idFormat.suffix || ""}`;
+
+        await prisma.inventory.update({
+          where: { id },
+          data: {
+            customIdFormat: {
+              ...idFormat,
+              currentCounter: (idFormat.currentCounter || idFormat.counterStart || 1) + 1,
+            },
           },
-        },
-      });
+        });
+      }
     }
 
     // Organize custom field values by type
@@ -106,6 +125,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       data: {
         name,
         tags: tags || [],
+        customId: customId, // Persist the generated custom ID
         inventoryId: id,
         creatorId: user.id,
         stringValues: Object.keys(stringValues).length > 0 ? stringValues : null,
@@ -126,7 +146,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
 
-    return Response.json({ item, customId }, { status: 201 });
+    return Response.json({ item }, { status: 201 });
   } catch (error) {
     console.error("Error creating item:", error);
     return Response.json({ error: "Failed to create item: " + (error as Error).message }, { status: 500 });

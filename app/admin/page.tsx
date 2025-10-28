@@ -28,12 +28,27 @@ export default function AdminDashboard() {
   const router = useRouter();
   const { showToast } = useToast();
   const [users, setUsers] = useState<User[]>([]);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
+    fetchCurrentUser();
     fetchUsers();
   }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await fetch("/api/user/me");
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentUserId(data.user.id);
+      }
+    } catch (error) {
+      console.error("Error fetching current user:", error);
+    }
+  };
 
   const fetchUsers = async () => {
     try {
@@ -54,6 +69,24 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleSelectUser = (userId: string) => {
+    const newSelected = new Set(selectedUsers);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
+    } else {
+      newSelected.add(userId);
+    }
+    setSelectedUsers(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedUsers.size === users.length) {
+      setSelectedUsers(new Set());
+    } else {
+      setSelectedUsers(new Set(users.map(u => u.id)));
+    }
+  };
+
   const handleUserAction = async (userId: string, action: string) => {
     setActionLoading(userId);
     try {
@@ -63,12 +96,19 @@ export default function AdminDashboard() {
         body: JSON.stringify({ action }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to update user");
+        // Show specific error message from backend
+        showToast(data.error || t("error_update_user"), "error");
+        return;
       }
 
       // Refresh users list
       await fetchUsers();
+
+      // Clear selection after action
+      setSelectedUsers(new Set());
 
       // Show success message
       const actionMessages: Record<string, string> = {
@@ -120,7 +160,7 @@ export default function AdminDashboard() {
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-              <p className="text-sm text-gray-600 dark:text-gray-400">{t("admin")}s</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{t("admins")}</p>
               <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{stats.admins}</p>
             </div>
 
@@ -136,6 +176,86 @@ export default function AdminDashboard() {
               <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t("user_management")}</h2>
             </div>
 
+            {/* Action Toolbar */}
+            {!loading && users.length > 0 && (
+              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {selectedUsers.size > 0
+                      ? `${selectedUsers.size} ${t("selected") || "selected"}`
+                      : t("no_users_selected") || "No users selected"}
+                  </span>
+                  {selectedUsers.size === 1 && (() => {
+                    const userId = Array.from(selectedUsers)[0];
+                    const user = users.find(u => u.id === userId);
+                    const isCurrentUser = userId === currentUserId;
+                    const isOtherAdmin = user?.role === "admin" && !isCurrentUser;
+
+                    return (
+                      <>
+                        {!user?.blocked ? (
+                          <button
+                            onClick={() => handleUserAction(userId, "block")}
+                            disabled={actionLoading === userId || isCurrentUser || isOtherAdmin}
+                            className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded transition flex items-center gap-1"
+                            title={isCurrentUser ? t("cannot_block_yourself") : isOtherAdmin ? t("cannot_block_other_admins") : ""}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                            </svg>
+                            {t("block_user") || "Block"}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleUserAction(userId, "unblock")}
+                            disabled={actionLoading === userId}
+                            className="px-3 py-1.5 text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded transition flex items-center gap-1"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            {t("unblock_user") || "Unblock"}
+                          </button>
+                        )}
+                        {user?.role !== "admin" ? (
+                          <button
+                            onClick={() => handleUserAction(userId, "makeAdmin")}
+                            disabled={actionLoading === userId}
+                            className="px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded transition flex items-center gap-1"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                            </svg>
+                            {t("make_admin") || "Make Admin"}
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleUserAction(userId, "removeAdmin")}
+                            disabled={actionLoading === userId || isOtherAdmin}
+                            className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded transition flex items-center gap-1"
+                            title={isOtherAdmin ? t("cannot_demote_other_admins") : ""}
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
+                            {t("remove_admin") || "Remove Admin"}
+                          </button>
+                        )}
+                      </>
+                    );
+                  })()}
+                  {selectedUsers.size > 0 && (
+                    <button
+                      onClick={() => setSelectedUsers(new Set())}
+                      className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded transition"
+                    >
+                      {t("clear_selection") || "Clear Selection"}
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {loading ? (
               <div className="p-6">
                 <TableSkeleton rows={8} />
@@ -145,22 +265,47 @@ export default function AdminDashboard() {
                 <table className="w-full">
                   <thead className="bg-gray-50 dark:bg-gray-700">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("user")}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("role")}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("status")}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("statistics")}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("joined")}</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("actions")}</th>
+                      <th className="w-12 px-4 py-3 text-left">
+                        <input
+                          type="checkbox"
+                          checked={selectedUsers.size === users.length && users.length > 0}
+                          onChange={handleSelectAll}
+                          className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                        />
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.user")}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.role")}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.status")}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.sessions")}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.joined")}</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {users.map((user) => (
-                      <tr key={user.id}>
+                    {users.map((user) => {
+                      const isCurrentUser = user.id === currentUserId;
+                      const isOtherAdmin = user.role === "admin" && !isCurrentUser;
+                      return (
+                      <tr key={user.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isCurrentUser ? "bg-blue-50 dark:bg-blue-900/10" : ""}`}>
+                        <td className="px-4 py-4">
+                          <input
+                            type="checkbox"
+                            checked={selectedUsers.has(user.id)}
+                            onChange={() => handleSelectUser(user.id)}
+                            className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                          />
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center">
                             <Image src={user.image || "/default-avatar.png"} alt={user.name} width={40} height={40} className="rounded-full" />
                             <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white">{user.name}</div>
+                              <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                {user.name}
+                                {isCurrentUser && (
+                                  <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                    {t("you")}
+                                  </span>
+                                )}
+                              </div>
                               <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
                             </div>
                           </div>
@@ -172,36 +317,14 @@ export default function AdminDashboard() {
                           <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${user.blocked ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>{user.blocked ? t("blocked") : t("active")}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                          <div>{user._count.inventories} inventories</div>
-                          <div>{user._count.items} items</div>
-                          <div>{user._count.comments} comments</div>
+                          <div>{user._count.inventories} {t("inventories").toLowerCase()}</div>
+                          <div>{user._count.items} {t("items")}</div>
+                          <div>{user._count.comments} {t("comments")}</div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(user.createdAt).toLocaleDateString()}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <div className="flex justify-end gap-2">
-                            {!user.blocked ? (
-                              <button onClick={() => handleUserAction(user.id, "block")} disabled={actionLoading === user.id} className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300 disabled:opacity-50">
-                                {t("block_user")}
-                              </button>
-                            ) : (
-                              <button onClick={() => handleUserAction(user.id, "unblock")} disabled={actionLoading === user.id} className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300 disabled:opacity-50">
-                                {t("unblock_user")}
-                              </button>
-                            )}
-
-                            {user.role !== "admin" ? (
-                              <button onClick={() => handleUserAction(user.id, "makeAdmin")} disabled={actionLoading === user.id} className="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300 disabled:opacity-50">
-                                {t("make_admin")}
-                              </button>
-                            ) : (
-                              <button onClick={() => handleUserAction(user.id, "removeAdmin")} disabled={actionLoading === user.id} className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-300 disabled:opacity-50">
-                                {t("remove_admin")}
-                              </button>
-                            )}
-                          </div>
-                        </td>
                       </tr>
-                    ))}
+                    );
+                    })}
                   </tbody>
                 </table>
               </div>

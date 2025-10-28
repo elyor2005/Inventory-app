@@ -4,8 +4,11 @@ import { useEffect } from "react";
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+  const { t } = useLanguage();
+
   useEffect(() => {
     console.error("Error:", error);
   }, [error]);
@@ -25,8 +28,8 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
 
           {/* Text */}
           <h1 className="text-6xl font-bold text-gray-900 dark:text-white mb-4">Oops!</h1>
-          <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-4">Something Went Wrong</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">An unexpected error occurred. Please try again or go back to the home page.</p>
+          <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-4">{t("something_went_wrong")}</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">{t("error_page_message")}</p>
 
           {/* Error Details (dev mode) */}
           {process.env.NODE_ENV === "development" && (
@@ -38,10 +41,10 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
           {/* Actions */}
           <div className="flex gap-4 justify-center">
             <button onClick={reset} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              Try Again
+              {t("try_again")}
             </button>
             <Link href="/" className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-              Go Home
+              {t("go_back_home")}
             </Link>
           </div>
         </div>

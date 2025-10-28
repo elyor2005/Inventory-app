@@ -1,14 +1,64 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
 import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useSession } from "@/lib/auth-client";
 import Link from "next/link";
+import Image from "next/image";
+import TagCloud from "@/components/TagCloud";
+import { TableSkeleton } from "@/components/LoadingSkeleton";
+
+interface Inventory {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  image: string | null;
+  creator: {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+  };
+  _count: {
+    items: number;
+  };
+}
+
+interface Tag {
+  tag: string;
+  count: number;
+}
 
 export default function Home() {
   const { t } = useLanguage();
   const { data: session } = useSession();
+  const [latestInventories, setLatestInventories] = useState<Inventory[]>([]);
+  const [popularInventories, setPopularInventories] = useState<Inventory[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchHomeData();
+  }, []);
+
+  const fetchHomeData = async () => {
+    try {
+      const [latestRes, popularRes, tagsRes] = await Promise.all([fetch("/api/home/latest"), fetch("/api/home/popular"), fetch("/api/home/tags")]);
+
+      const [latestData, popularData, tagsData] = await Promise.all([latestRes.json(), popularRes.json(), tagsRes.json()]);
+
+      setLatestInventories(latestData.inventories || []);
+      setPopularInventories(popularData.inventories || []);
+      setTags(tagsData.tags || []);
+    } catch (error) {
+      console.error("Error fetching home data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
@@ -108,6 +158,145 @@ export default function Home() {
                 <p className="text-gray-600 dark:text-gray-400">{t("homepage.features.statistics.description")}</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Latest Inventories Table */}
+        <section className="py-20 bg-white dark:bg-gray-900">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">{t("homepage.latestInventories") || "Latest Inventories"}</h2>
+
+            {loading ? (
+              <TableSkeleton rows={5} />
+            ) : latestInventories.length === 0 ? (
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400">{t("no_inventories") || "No public inventories available"}</div>
+            ) : (
+              <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("inventory_name") || "Name"}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("description") || "Description"}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("creator") || "Creator"}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("category") || "Category"}</th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("items") || "Items"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                    {latestInventories.map((inventory) => (
+                      <tr key={inventory.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <td className="px-6 py-4">
+                          <Link href={`/inventories/${inventory.id}`} className="flex items-center gap-3">
+                            {inventory.image && (
+                              <div className="relative w-12 h-12 flex-shrink-0">
+                                <Image src={inventory.image} alt={inventory.title} fill className="rounded object-cover" sizes="48px" />
+                              </div>
+                            )}
+                            <span className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition">{inventory.title}</span>
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 max-w-md">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{inventory.description}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            {inventory.creator.image && (
+                              <div className="relative w-6 h-6 flex-shrink-0">
+                                <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="24px" />
+                              </div>
+                            )}
+                            <span className="text-sm text-gray-700 dark:text-gray-300">{inventory.creator.name || inventory.creator.email}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full">{t(`categories.${inventory.category.toLowerCase()}`) || inventory.category}</span>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="text-sm font-medium text-gray-900 dark:text-white">{inventory._count.items}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Top 5 Popular Inventories */}
+        <section className="py-20 bg-gray-50 dark:bg-gray-800">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">{t("homepage.popularInventories") || "Top 5 Most Popular Inventories"}</h2>
+
+            {loading ? (
+              <TableSkeleton rows={5} />
+            ) : popularInventories.length === 0 ? (
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400">{t("no_inventories") || "No inventories available"}</div>
+            ) : (
+              <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900">
+                <table className="w-full">
+                  <thead className="bg-gray-50 dark:bg-gray-800">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("rank") || "Rank"}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("inventory_name") || "Name"}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("description") || "Description"}</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("creator") || "Creator"}</th>
+                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("item_count") || "Item Count"}</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                    {popularInventories.map((inventory, index) => (
+                      <tr key={inventory.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold">{index + 1}</div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <Link href={`/inventories/${inventory.id}`} className="flex items-center gap-3">
+                            {inventory.image && (
+                              <div className="relative w-12 h-12 flex-shrink-0">
+                                <Image src={inventory.image} alt={inventory.title} fill className="rounded object-cover" sizes="48px" />
+                              </div>
+                            )}
+                            <span className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition">{inventory.title}</span>
+                          </Link>
+                        </td>
+                        <td className="px-6 py-4 max-w-md">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{inventory.description}</p>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-2">
+                            {inventory.creator.image && (
+                              <div className="relative w-6 h-6 flex-shrink-0">
+                                <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="24px" />
+                              </div>
+                            )}
+                            <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[150px]">{inventory.creator.name || inventory.creator.email}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span className="text-lg font-bold text-gray-900 dark:text-white">{inventory._count.items}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Tag Cloud */}
+        <section className="py-20 bg-white dark:bg-gray-900">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">{t("homepage.tagCloud") || "Explore by Tags"}</h2>
+
+            {loading ? (
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400">{t("loading") || "Loading tags..."}</div>
+            ) : (
+              <div className="max-w-5xl mx-auto bg-gray-50 dark:bg-gray-800 rounded-xl p-8">
+                <TagCloud tags={tags} />
+              </div>
+            )}
           </div>
         </section>
 

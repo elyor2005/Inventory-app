@@ -1,8 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Header from "@/components/Header";
 import Footer from "@/components/layout/Footer";
+import { useLanguage } from "@/components/providers/LanguageProvider";
 
 export default function NotFound() {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen flex flex-col bg-white dark:bg-gray-950">
       <Header />
@@ -18,16 +23,16 @@ export default function NotFound() {
 
           {/* Text */}
           <h1 className="text-6xl font-bold text-gray-900 dark:text-white mb-4">404</h1>
-          <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-4">Page Not Found</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">The page you&apos;re looking for doesn&apos;t exist or has been moved.</p>
+          <h2 className="text-3xl font-bold text-gray-700 dark:text-gray-300 mb-4">{t("page_not_found")}</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">{t("not_found_message")}</p>
 
           {/* Actions */}
           <div className="flex gap-4 justify-center">
             <Link href="/" className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              Go Home
+              {t("go_back_home")}
             </Link>
             <Link href="/explore" className="px-6 py-3 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
-              Explore Inventories
+              {t("homepage.exploreInventories")}
             </Link>
           </div>
         </div>
