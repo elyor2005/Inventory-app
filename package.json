@@ -17,6 +17,7 @@
     "@prisma/client": "^6.17.1",
     "better-auth": "^1.3.27",
     "bson": "^6.10.4",
+    "lucide-react": "^0.468.0",
     "next": "15.5.4",
     "next-cloudinary": "^6.16.0",
     "next-intl": "^4.3.12",
