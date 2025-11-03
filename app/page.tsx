@@ -66,20 +66,20 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-20">
+        <section className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-12 sm:py-16 md:py-20">
           <div className="container mx-auto px-4 text-center">
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">{t("home.title")}</h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">{t("home.subtitle")}</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6">{t("home.title")}</h1>
+            <p className="text-base sm:text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-6 sm:mb-8 max-w-2xl mx-auto">{t("home.subtitle")}</p>
 
             {!session ? (
-              <div className="flex gap-4 justify-center">
-                <button className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-lg transition shadow-lg hover:shadow-xl">{t("homepage.getStarted")}</button>
-                <Link href="/explore" className="px-8 py-3 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold text-lg transition">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-md sm:max-w-none mx-auto">
+                <button className="px-6 py-2.5 sm:px-8 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-base sm:text-lg transition shadow-lg hover:shadow-xl">{t("homepage.getStarted")}</button>
+                <Link href="/explore" className="px-6 py-2.5 sm:px-8 sm:py-3 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white border-2 border-gray-300 dark:border-gray-600 rounded-lg font-semibold text-base sm:text-lg transition text-center">
                   {t("homepage.exploreInventories")}
                 </Link>
               </div>
             ) : (
-              <Link href="/inventories" className="inline-block px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-lg transition shadow-lg hover:shadow-xl">
+              <Link href="/inventories" className="inline-block px-6 py-2.5 sm:px-8 sm:py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold text-base sm:text-lg transition shadow-lg hover:shadow-xl">
                 {t("homepage.goToMyInventories")} →
               </Link>
             )}
@@ -87,11 +87,11 @@ export default function Home() {
         </section>
 
         {/* Features Section */}
-        <section className="py-20 bg-white dark:bg-gray-900">
+        <section className="py-12 sm:py-16 md:py-20 bg-white dark:bg-gray-900">
           <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">{t("homepage.featuresTitle")}</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 dark:text-white mb-8 sm:mb-12">{t("homepage.featuresTitle")}</h2>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
               {/* Feature 1 */}
               <div className="p-6 bg-gray-50 dark:bg-gray-800 rounded-xl">
                 <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
@@ -171,54 +171,88 @@ export default function Home() {
             ) : latestInventories.length === 0 ? (
               <div className="text-center py-12 text-gray-500 dark:text-gray-400">{t("no_inventories") || "No public inventories available"}</div>
             ) : (
-              <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
-                <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-800">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("inventory_name") || "Name"}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("description") || "Description"}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("creator") || "Creator"}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("category") || "Category"}</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("items") || "Items"}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-                    {latestInventories.map((inventory) => (
-                      <tr key={inventory.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <td className="px-6 py-4">
-                          <Link href={`/inventories/${inventory.id}`} className="flex items-center gap-3">
-                            {inventory.image && (
-                              <div className="relative w-12 h-12 flex-shrink-0">
-                                <Image src={inventory.image} alt={inventory.title} fill className="rounded object-cover" sizes="48px" />
-                              </div>
-                            )}
-                            <span className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition">{inventory.title}</span>
-                          </Link>
-                        </td>
-                        <td className="px-6 py-4 max-w-md">
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{inventory.description}</p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {inventory.creator.image && (
-                              <div className="relative w-6 h-6 flex-shrink-0">
-                                <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="24px" />
-                              </div>
-                            )}
-                            <span className="text-sm text-gray-700 dark:text-gray-300">{inventory.creator.name || inventory.creator.email}</span>
+              <>
+                {/* Mobile Card Layout */}
+                <div className="md:hidden space-y-4">
+                  {latestInventories.map((inventory) => (
+                    <Link key={inventory.id} href={`/inventories/${inventory.id}`} className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start gap-3 mb-3">
+                        {inventory.image && (
+                          <div className="relative w-16 h-16 flex-shrink-0">
+                            <Image src={inventory.image} alt={inventory.title} fill className="rounded object-cover" sizes="64px" />
                           </div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full">{t(`categories.${inventory.category.toLowerCase()}`) || inventory.category}</span>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{inventory._count.items}</span>
-                        </td>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1">{inventory.title}</h3>
+                          <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full">{t(`categories.${inventory.category.toLowerCase()}`) || inventory.category}</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">{inventory.description}</p>
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="flex items-center gap-2">
+                          {inventory.creator.image && (
+                            <div className="relative w-5 h-5 flex-shrink-0">
+                              <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="20px" />
+                            </div>
+                          )}
+                          <span className="text-gray-700 dark:text-gray-300 truncate">{inventory.creator.name || inventory.creator.email}</span>
+                        </div>
+                        <span className="text-gray-900 dark:text-white font-medium">{inventory._count.items} items</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Desktop Table Layout */}
+                <div className="hidden md:block overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("inventory_name") || "Name"}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("description") || "Description"}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("creator") || "Creator"}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("category") || "Category"}</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("items") || "Items"}</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+                      {latestInventories.map((inventory) => (
+                        <tr key={inventory.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                          <td className="px-6 py-4">
+                            <Link href={`/inventories/${inventory.id}`} className="flex items-center gap-3">
+                              {inventory.image && (
+                                <div className="relative w-12 h-12 flex-shrink-0">
+                                  <Image src={inventory.image} alt={inventory.title} fill className="rounded object-cover" sizes="48px" />
+                                </div>
+                              )}
+                              <span className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition">{inventory.title}</span>
+                            </Link>
+                          </td>
+                          <td className="px-6 py-4 max-w-md">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{inventory.description}</p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              {inventory.creator.image && (
+                                <div className="relative w-6 h-6 flex-shrink-0">
+                                  <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="24px" />
+                                </div>
+                              )}
+                              <span className="text-sm text-gray-700 dark:text-gray-300">{inventory.creator.name || inventory.creator.email}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded-full">{t(`categories.${inventory.category.toLowerCase()}`) || inventory.category}</span>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">{inventory._count.items}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </section>
@@ -233,54 +267,88 @@ export default function Home() {
             ) : popularInventories.length === 0 ? (
               <div className="text-center py-12 text-gray-500 dark:text-gray-400">{t("no_inventories") || "No inventories available"}</div>
             ) : (
-              <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900">
-                <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-800">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("rank") || "Rank"}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("inventory_name") || "Name"}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("description") || "Description"}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("creator") || "Creator"}</th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("item_count") || "Item Count"}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                    {popularInventories.map((inventory, index) => (
-                      <tr key={inventory.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <td className="px-6 py-4">
-                          <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold">{index + 1}</div>
-                        </td>
-                        <td className="px-6 py-4">
-                          <Link href={`/inventories/${inventory.id}`} className="flex items-center gap-3">
-                            {inventory.image && (
-                              <div className="relative w-12 h-12 flex-shrink-0">
-                                <Image src={inventory.image} alt={inventory.title} fill className="rounded object-cover" sizes="48px" />
-                              </div>
-                            )}
-                            <span className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition">{inventory.title}</span>
-                          </Link>
-                        </td>
-                        <td className="px-6 py-4 max-w-md">
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{inventory.description}</p>
-                        </td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            {inventory.creator.image && (
-                              <div className="relative w-6 h-6 flex-shrink-0">
-                                <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="24px" />
-                              </div>
-                            )}
-                            <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[150px]">{inventory.creator.name || inventory.creator.email}</span>
+              <>
+                {/* Mobile Card Layout */}
+                <div className="md:hidden space-y-4">
+                  {popularInventories.map((inventory, index) => (
+                    <Link key={inventory.id} href={`/inventories/${inventory.id}`} className="block bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg transition-shadow">
+                      <div className="flex items-start gap-3 mb-3">
+                        <div className="flex items-center justify-center w-10 h-10 flex-shrink-0 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold text-lg">
+                          {index + 1}
+                        </div>
+                        {inventory.image && (
+                          <div className="relative w-16 h-16 flex-shrink-0">
+                            <Image src={inventory.image} alt={inventory.title} fill className="rounded object-cover" sizes="64px" />
                           </div>
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <span className="text-lg font-bold text-gray-900 dark:text-white">{inventory._count.items}</span>
-                        </td>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-1">{inventory.title}</h3>
+                          <span className="text-lg font-bold text-gray-900 dark:text-white">{inventory._count.items} items</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-3">{inventory.description}</p>
+                      <div className="flex items-center gap-2 text-sm">
+                        {inventory.creator.image && (
+                          <div className="relative w-5 h-5 flex-shrink-0">
+                            <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="20px" />
+                          </div>
+                        )}
+                        <span className="text-gray-700 dark:text-gray-300 truncate">{inventory.creator.name || inventory.creator.email}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Desktop Table Layout */}
+                <div className="hidden md:block overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-gray-800">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("rank") || "Rank"}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("inventory_name") || "Name"}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("description") || "Description"}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("creator") || "Creator"}</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("item_count") || "Item Count"}</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                      {popularInventories.map((inventory, index) => (
+                        <tr key={inventory.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                          <td className="px-6 py-4">
+                            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 font-bold">{index + 1}</div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <Link href={`/inventories/${inventory.id}`} className="flex items-center gap-3">
+                              {inventory.image && (
+                                <div className="relative w-12 h-12 flex-shrink-0">
+                                  <Image src={inventory.image} alt={inventory.title} fill className="rounded object-cover" sizes="48px" />
+                                </div>
+                              )}
+                              <span className="font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition">{inventory.title}</span>
+                            </Link>
+                          </td>
+                          <td className="px-6 py-4 max-w-md">
+                            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{inventory.description}</p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              {inventory.creator.image && (
+                                <div className="relative w-6 h-6 flex-shrink-0">
+                                  <Image src={inventory.creator.image} alt={inventory.creator.name || "User"} fill className="rounded-full object-cover" sizes="24px" />
+                                </div>
+                              )}
+                              <span className="text-sm text-gray-700 dark:text-gray-300 truncate max-w-[150px]">{inventory.creator.name || inventory.creator.email}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <span className="text-lg font-bold text-gray-900 dark:text-white">{inventory._count.items}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </section>

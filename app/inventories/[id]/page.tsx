@@ -318,18 +318,25 @@ export default function InventoryDetailPage() {
           </div>
 
           {/* Tabs */}
-          <div className="mb-6 border-b dark:border-gray-700">
-            <div className="flex gap-4 overflow-x-auto">
+          <div className="mb-6 border-b dark:border-gray-700 relative">
+            {/* Left scroll indicator */}
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white dark:from-gray-900 to-transparent pointer-events-none z-10 md:hidden"></div>
+
+            {/* Tabs container */}
+            <div className="flex gap-2 sm:gap-4 overflow-x-auto scrollbar-hide">
               {tabs.map((tab) => {
                 if (tab.requiresEdit && !canEdit) return null;
 
                 return (
-                  <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-3 font-medium border-b-2 transition whitespace-nowrap ${activeTab === tab.id ? "border-blue-600 text-blue-600 dark:text-blue-400" : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}>
+                  <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-3 sm:px-4 py-3 text-sm sm:text-base font-medium border-b-2 transition whitespace-nowrap flex-shrink-0 ${activeTab === tab.id ? "border-blue-600 text-blue-600 dark:text-blue-400" : "border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"}`}>
                     {tab.label}
                   </button>
                 );
               })}
             </div>
+
+            {/* Right scroll indicator */}
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white dark:from-gray-900 to-transparent pointer-events-none z-10 md:hidden"></div>
           </div>
 
           {/* Tab Content */}

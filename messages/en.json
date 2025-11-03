@@ -12,7 +12,8 @@
     "create": "Create",
     "search": "Search",
     "filter": "Filter",
-    "actions": "Actions"
+    "actions": "Actions",
+    "settings": "Settings"
   },
   "nav": {
     "home": "Home",
@@ -162,7 +163,7 @@
   },
   "admins": "Admins",
   "you": "You",
-  "explore": {
+  "explores": {
     "title": "Explore Public Inventories",
     "description": "Browse all public inventories from the community"
   },

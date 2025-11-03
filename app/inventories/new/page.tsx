@@ -226,8 +226,8 @@ export default function NewInventoryPage() {
             </div>
 
             {/* Buttons */}
-            <div className="flex gap-4 sticky bottom-4 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-              <button type="button" onClick={() => router.back()} className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition">
+            <div className="flex flex-col-reverse sm:flex-row gap-3 sm:gap-4 sticky bottom-0 sm:bottom-4 bg-white dark:bg-gray-800 p-3 sm:p-4 rounded-none sm:rounded-lg shadow-lg border-t sm:border border-gray-200 dark:border-gray-700 -mx-4 sm:mx-0">
+              <button type="button" onClick={() => router.back()} className="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg font-medium transition sm:w-auto">
                 {t("cancel") || "Cancel"}
               </button>
               <button type="submit" disabled={loading} className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg font-medium transition">

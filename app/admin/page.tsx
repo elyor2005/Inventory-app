@@ -8,6 +8,7 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
 import Image from "next/image";
 import { useToast } from '@/components/providers/ToastProvider';
 import { TableSkeleton } from "@/components/LoadingSkeleton";
+import { Ban, CheckCircle, Sparkles, Minus } from "lucide-react";
 interface User {
   id: string;
   name: string;
@@ -178,8 +179,8 @@ export default function AdminDashboard() {
 
             {/* Action Toolbar */}
             {!loading && users.length > 0 && (
-              <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <div className="flex items-center gap-3">
+              <div className="px-4 sm:px-6 py-4 border-b border-gray-200 dark:border-gray-700">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
                     {selectedUsers.size > 0
                       ? `${selectedUsers.size} ${t("selected") || "selected"}`
@@ -192,64 +193,56 @@ export default function AdminDashboard() {
                     const isOtherAdmin = user?.role === "admin" && !isCurrentUser;
 
                     return (
-                      <>
+                      <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
                         {!user?.blocked ? (
                           <button
                             onClick={() => handleUserAction(userId, "block")}
                             disabled={actionLoading === userId || isCurrentUser || isOtherAdmin}
-                            className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded transition flex items-center gap-1"
+                            className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white rounded transition flex items-center gap-1 flex-1 sm:flex-initial justify-center"
                             title={isCurrentUser ? t("cannot_block_yourself") : isOtherAdmin ? t("cannot_block_other_admins") : ""}
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
-                            </svg>
-                            {t("block_user") || "Block"}
+                            <Ban className="w-4 h-4" />
+                            <span className="hidden sm:inline">{t("block_user") || "Block"}</span>
                           </button>
                         ) : (
                           <button
                             onClick={() => handleUserAction(userId, "unblock")}
                             disabled={actionLoading === userId}
-                            className="px-3 py-1.5 text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded transition flex items-center gap-1"
+                            className="px-3 py-2 text-sm bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white rounded transition flex items-center gap-1 flex-1 sm:flex-initial justify-center"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            {t("unblock_user") || "Unblock"}
+                            <CheckCircle className="w-4 h-4" />
+                            <span className="hidden sm:inline">{t("unblock_user") || "Unblock"}</span>
                           </button>
                         )}
                         {user?.role !== "admin" ? (
                           <button
                             onClick={() => handleUserAction(userId, "makeAdmin")}
                             disabled={actionLoading === userId}
-                            className="px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded transition flex items-center gap-1"
+                            className="px-3 py-2 text-sm bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white rounded transition flex items-center gap-1 flex-1 sm:flex-initial justify-center"
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                            </svg>
-                            {t("make_admin") || "Make Admin"}
+                            <Sparkles className="w-4 h-4" />
+                            <span className="hidden sm:inline">{t("make_admin") || "Admin"}</span>
                           </button>
                         ) : (
                           <button
                             onClick={() => handleUserAction(userId, "removeAdmin")}
                             disabled={actionLoading === userId || isOtherAdmin}
-                            className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded transition flex items-center gap-1"
+                            className="px-3 py-2 text-sm bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white rounded transition flex items-center gap-1 flex-1 sm:flex-initial justify-center"
                             title={isOtherAdmin ? t("cannot_demote_other_admins") : ""}
                           >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                            </svg>
-                            {t("remove_admin") || "Remove Admin"}
+                            <Minus className="w-4 h-4" />
+                            <span className="hidden sm:inline">{t("remove_admin") || "Remove"}</span>
                           </button>
                         )}
-                      </>
+                      </div>
                     );
                   })()}
                   {selectedUsers.size > 0 && (
                     <button
                       onClick={() => setSelectedUsers(new Set())}
-                      className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded transition"
+                      className="px-3 py-2 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded transition w-full sm:w-auto"
                     >
-                      {t("clear_selection") || "Clear Selection"}
+                      {t("clear_selection") || "Clear"}
                     </button>
                   )}
                 </div>
@@ -261,72 +254,138 @@ export default function AdminDashboard() {
                 <TableSkeleton rows={8} />
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                      <th className="w-12 px-4 py-3 text-left">
-                        <input
-                          type="checkbox"
-                          checked={selectedUsers.size === users.length && users.length > 0}
-                          onChange={handleSelectAll}
-                          className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                        />
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.user")}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.role")}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.status")}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.sessions")}</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.joined")}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    {users.map((user) => {
-                      const isCurrentUser = user.id === currentUserId;
-                      return (
-                      <tr key={user.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isCurrentUser ? "bg-blue-50 dark:bg-blue-900/10" : ""}`}>
-                        <td className="px-4 py-4">
+              <>
+                {/* Mobile Card Layout */}
+                <div className="md:hidden p-4 space-y-4">
+                  {users.map((user) => {
+                    const isCurrentUser = user.id === currentUserId;
+                    return (
+                      <div key={user.id} className={`border border-gray-200 dark:border-gray-700 rounded-lg p-4 ${isCurrentUser ? "bg-blue-50 dark:bg-blue-900/10 border-blue-300 dark:border-blue-700" : "bg-white dark:bg-gray-800"}`}>
+                        {/* Header with Checkbox and Status */}
+                        <div className="flex items-center justify-between mb-3">
                           <input
                             type="checkbox"
                             checked={selectedUsers.has(user.id)}
                             onChange={() => handleSelectUser(user.id)}
+                            className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                          />
+                          <span className={`px-2 py-1 text-xs font-semibold rounded-full ${user.blocked ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>
+                            {user.blocked ? t("blocked") : t("active")}
+                          </span>
+                        </div>
+
+                        {/* User Info */}
+                        <div className="flex items-start gap-3 mb-3">
+                          <Image src={user.image || "/default-avatar.png"} alt={user.name} width={48} height={48} className="rounded-full flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-gray-900 dark:text-white truncate">{user.name}</h3>
+                              {isCurrentUser && (
+                                <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 flex-shrink-0">
+                                  {t("you")}
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm text-gray-600 dark:text-gray-400 truncate">{user.email}</p>
+                            <span className={`inline-flex mt-1 px-2 py-0.5 text-xs font-semibold rounded-full ${user.role === "admin" ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"}`}>
+                              {user.role}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Stats */}
+                        <div className="grid grid-cols-3 gap-2 mb-3 text-center text-sm">
+                          <div>
+                            <div className="font-semibold text-gray-900 dark:text-white">{user._count.inventories}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{t("inventories")}</div>
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-900 dark:text-white">{user._count.items}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{t("items")}</div>
+                          </div>
+                          <div>
+                            <div className="font-semibold text-gray-900 dark:text-white">{user._count.comments}</div>
+                            <div className="text-xs text-gray-500 dark:text-gray-400">{t("comments")}</div>
+                          </div>
+                        </div>
+
+                        {/* Joined Date */}
+                        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                          {t("joined") || "Joined"}: {new Date(user.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Desktop Table Layout */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
+                      <tr>
+                        <th className="w-12 px-4 py-3 text-left">
+                          <input
+                            type="checkbox"
+                            checked={selectedUsers.size === users.length && users.length > 0}
+                            onChange={handleSelectAll}
                             className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500"
                           />
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <Image src={user.image || "/default-avatar.png"} alt={user.name} width={40} height={40} className="rounded-full" />
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
-                                {user.name}
-                                {isCurrentUser && (
-                                  <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                                    {t("you")}
-                                  </span>
-                                )}
-                              </div>
-                              <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === "admin" ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"}`}>{user.role}</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${user.blocked ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>{user.blocked ? t("blocked") : t("active")}</span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                          <div>{user._count.inventories} {t("inventories").toLowerCase()}</div>
-                          <div>{user._count.items} {t("items")}</div>
-                          <div>{user._count.comments} {t("comments")}</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(user.createdAt).toLocaleDateString()}</td>
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.user")}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.role")}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.status")}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.sessions")}</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">{t("admin.table.joined")}</th>
                       </tr>
-                    );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                      {users.map((user) => {
+                        const isCurrentUser = user.id === currentUserId;
+                        return (
+                        <tr key={user.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${isCurrentUser ? "bg-blue-50 dark:bg-blue-900/10" : ""}`}>
+                          <td className="px-4 py-4">
+                            <input
+                              type="checkbox"
+                              checked={selectedUsers.has(user.id)}
+                              onChange={() => handleSelectUser(user.id)}
+                              className="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                            />
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <Image src={user.image || "/default-avatar.png"} alt={user.name} width={40} height={40} className="rounded-full" />
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                                  {user.name}
+                                  {isCurrentUser && (
+                                    <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
+                                      {t("you")}
+                                    </span>
+                                  )}
+                                </div>
+                                <div className="text-sm text-gray-500 dark:text-gray-400">{user.email}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${user.role === "admin" ? "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400" : "bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300"}`}>{user.role}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${user.blocked ? "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400" : "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"}`}>{user.blocked ? t("blocked") : t("active")}</span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                            <div>{user._count.inventories} {t("inventories").toLowerCase()}</div>
+                            <div>{user._count.items} {t("items")}</div>
+                            <div>{user._count.comments} {t("comments")}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{new Date(user.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                      );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </div>

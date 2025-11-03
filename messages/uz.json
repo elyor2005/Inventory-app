@@ -12,7 +12,8 @@
     "create": "Yaratish",
     "search": "Qidirish",
     "filter": "Filtr",
-    "actions": "Amallar"
+    "actions": "Amallar",
+    "settings": "Sozlamalar"
   },
   "nav": {
     "home": "Bosh sahifa",
@@ -162,7 +163,7 @@
   },
   "admins": "Adminlar",
   "you": "Siz",
-  "explore": {
+  "explores": {
     "title": "Ommaviy Inventarlarni Kashf Qilish",
     "description": "Jamoa tomonidan yaratilgan barcha ommaviy inventarlarni ko'ring"
   },

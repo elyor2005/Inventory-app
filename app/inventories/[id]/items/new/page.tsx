@@ -65,8 +65,9 @@ export default function NewItemPage() {
         // Generate preview ID if custom ID is enabled
         if (data.inventory.customIdFormat?.enabled) {
           const format = data.inventory.customIdFormat;
-          const counter = (format.currentCounter || format.counterStart).toString().padStart(format.counterPadding, "0");
-          setGeneratedId(`${format.prefix}${counter}${format.suffix}`);
+          const counterValue = format.currentCounter ?? format.counterStart ?? 1;
+          const counter = counterValue.toString().padStart(format.counterPadding || 3, "0");
+          setGeneratedId(`${format.prefix || ""}${counter}${format.suffix || ""}`);
         }
       } else {
         router.push("/inventories");

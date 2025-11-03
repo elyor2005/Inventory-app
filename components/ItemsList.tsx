@@ -7,6 +7,7 @@ import { useLanguage } from "@/components/providers/LanguageProvider";
 import { useToast } from "@/components/providers/ToastProvider";
 import LikeButton from "./LikeButton";
 import { ItemCardSkeleton } from "./LoadingSkeleton";
+import { Edit, Trash2 } from "lucide-react";
 interface Item {
   id: string;
   name: string;
@@ -139,34 +140,30 @@ export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListP
 
       {/* Toolbar - Only show when canEdit and items exist */}
       {canEdit && items.length > 0 && (
-        <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
           <span className="text-sm text-gray-600 dark:text-gray-400">
             {selectedItems.size > 0 ? `${selectedItems.size} ${t("selected") || "selected"}` : t("no_items_selected") || "No items selected"}
           </span>
           {selectedItems.size > 0 && (
-            <>
+            <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
               {/* Show Edit button when exactly 1 item is selected */}
               {selectedItems.size === 1 && (
                 <Link
                   href={`/inventories/${inventoryId}/items/${Array.from(selectedItems)[0]}/edit`}
-                  className="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition flex items-center gap-1"
+                  className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded transition flex items-center gap-1 flex-1 sm:flex-initial justify-center"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                  {t("common.edit") || "Edit"}
+                  <Edit className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t("common.edit") || "Edit"}</span>
                 </Link>
               )}
-              <button onClick={handleBulkDelete} className="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition flex items-center gap-1">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                {t("delete") || "Delete"}
+              <button onClick={handleBulkDelete} className="px-3 py-2 text-sm bg-red-600 hover:bg-red-700 text-white rounded transition flex items-center gap-1 flex-1 sm:flex-initial justify-center">
+                <Trash2 className="w-4 h-4" />
+                <span className="hidden sm:inline">{t("delete") || "Delete"}</span>
               </button>
-              <button onClick={() => { setSelectedItems(new Set()); setSelectAll(false); }} className="px-3 py-1.5 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded transition">
-                {t("clear_selection") || "Clear Selection"}
+              <button onClick={() => { setSelectedItems(new Set()); setSelectAll(false); }} className="px-3 py-2 text-sm bg-gray-600 hover:bg-gray-700 text-white rounded transition flex-1 sm:flex-initial">
+                {t("clear_selection") || "Clear"}
               </button>
-            </>
+            </div>
           )}
         </div>
       )}
@@ -208,8 +205,61 @@ export default function ItemsList({ inventoryId, canEdit, isPublic }: ItemsListP
           {/* Results Count */}
           {(searchQuery || selectedTag) && <div className="text-sm text-gray-600 dark:text-gray-400">{t("showing_items") ? String(t("showing_items")).replace("{count}", filteredItems.length.toString()).replace("{total}", items.length.toString()) : `Showing ${filteredItems.length} of ${items.length} items`}</div>}
 
-          {/* Items Table */}
-          <div className="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
+          {/* Mobile Card Layout */}
+          <div className="md:hidden space-y-3">
+            {filteredItems.map((item) => (
+              <div key={item.id} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                {/* Header Row with Checkbox and Custom ID */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    {canEdit && (
+                      <input type="checkbox" checked={selectedItems.has(item.id)} onChange={() => handleSelectItem(item.id)} className="w-5 h-5 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-2 focus:ring-blue-500" />
+                    )}
+                    {item.customId && (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400">
+                        {item.customId}
+                      </span>
+                    )}
+                  </div>
+                  <LikeButton itemId={item.id} inventoryId={inventoryId} showCount={true} />
+                </div>
+
+                {/* Item Name - Clickable */}
+                <Link href={`/inventories/${inventoryId}/items/${item.id}`} className="block mb-3">
+                  <h3 className="font-semibold text-gray-900 dark:text-white text-lg mb-1 hover:text-blue-600 dark:hover:text-blue-400 transition">
+                    {item.name}
+                  </h3>
+                </Link>
+
+                {/* Tags */}
+                {item.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {item.tags.map((tag) => (
+                      <span key={tag} className="px-2 py-0.5 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-400 rounded text-xs whitespace-nowrap">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Creator and Date */}
+                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center gap-2">
+                    {item.creator.image && (
+                      <div className="relative w-5 h-5 flex-shrink-0">
+                        <Image src={item.creator.image} alt={item.creator.name || "User"} fill className="rounded-full object-cover" sizes="20px" />
+                      </div>
+                    )}
+                    <span className="truncate">{item.creator.name || item.creator.email}</span>
+                  </div>
+                  <span className="text-xs">{new Date(item.createdAt).toLocaleDateString()}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table Layout */}
+          <div className="hidden md:block overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-lg">
             <table className="w-full">
               <thead className="bg-gray-50 dark:bg-gray-800">
                 <tr>

@@ -55,11 +55,6 @@ export default function Header() {
         <div className="md:hidden pb-3">
           <SearchBar />
         </div>
-
-        {/* Mobile Auth (if not logged in) */}
-        <div className="sm:hidden pb-3">
-          <LoginButton />
-        </div>
       </div>
     </header>
   );
