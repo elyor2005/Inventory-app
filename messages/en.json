@@ -2,6 +2,7 @@
   "common": {
     "appName": "Inventory Management",
     "signIn": "Sign in with Google",
+    "signInGitHub": "Sign in with GitHub",
     "signOut": "Sign Out",
     "loading": "Loading...",
     "cancel": "Cancel",

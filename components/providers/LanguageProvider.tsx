@@ -33,7 +33,6 @@ export function LanguageProvider({ children, initialLocale = defaultLocale }: { 
         setMessages(loadedMessages.default || loadedMessages);
         setIsReady(true);
       } catch (error) {
-        console.error(`Failed to load messages for locale: ${locale}`, error);
         setIsReady(true);
       }
     };

@@ -11,7 +11,7 @@ export async function getCurrentUser(request: Request) {
       return null;
     }
 
-    // Fetch full user info including role from database
+    // Fetch full user info including role and provider data from database
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -21,6 +21,8 @@ export async function getCurrentUser(request: Request) {
         image: true,
         role: true,
         blocked: true,
+        lastProvider: true,
+        providerData: true,
       },
     });
 
@@ -29,9 +31,39 @@ export async function getCurrentUser(request: Request) {
       return null;
     }
 
-    return user;
+    if (!user) {
+      return null;
+    }
+
+    // If user has provider-specific data, return it based on lastProvider
+    if (user.lastProvider && user.providerData) {
+      const providerData = user.providerData as any;
+      const currentProviderData = providerData[user.lastProvider];
+
+      if (currentProviderData) {
+        // Return provider-specific data
+        return {
+          id: user.id,
+          email: currentProviderData.email || user.email,
+          name: currentProviderData.name || user.name,
+          image: currentProviderData.image || user.image,
+          role: user.role,
+          blocked: user.blocked,
+          currentProvider: user.lastProvider,
+        };
+      }
+    }
+
+    // Fallback to regular user data if no provider data exists
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      image: user.image,
+      role: user.role,
+      blocked: user.blocked,
+    };
   } catch (error) {
-    console.error("Error getting current user:", error);
     return null;
   }
 }
