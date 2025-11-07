@@ -1,15 +1,19 @@
 import { NextRequest } from "next/server";
+import { requireAdmin } from "@/lib/admin";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { prisma } from "@/lib/prisma";
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const unauthorized = await requireAdmin(request);
+    if (unauthorized) return unauthorized;
+
     const session = await auth.api.getSession({
       headers: await headers(),
     });
 
-    if (!session?.user || session.user.role !== "admin") {
+    if (!session?.user?.id) {
       return Response.json({ error: "Unauthorized" }, { status: 401 });
     }
 

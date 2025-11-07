@@ -37,7 +37,7 @@ export async function getCurrentUser(request: Request) {
 
     // If user has provider-specific data, return it based on lastProvider
     if (user.lastProvider && user.providerData) {
-      const providerData = user.providerData as any;
+      const providerData = user.providerData as Record<string, { email?: string; name?: string; image?: string }>;
       const currentProviderData = providerData[user.lastProvider];
 
       if (currentProviderData) {
@@ -63,7 +63,7 @@ export async function getCurrentUser(request: Request) {
       role: user.role,
       blocked: user.blocked,
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

@@ -1,16 +1,10 @@
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
+import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const session = await auth.api.getSession({
-      headers: await headers(),
-    });
-
-    if (!session?.user || session.user.role !== "admin") {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const unauthorized = await requireAdmin(request);
+    if (unauthorized) return unauthorized;
 
     const users = await prisma.user.findMany({
       select: {

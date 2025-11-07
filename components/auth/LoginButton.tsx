@@ -44,7 +44,7 @@ export default function LoginButton() {
         provider,
         callbackURL: "/"
       });
-    } catch (error) {
+    } catch {
       // Clean up on error
       localStorage.removeItem("lastOAuthProvider");
     }

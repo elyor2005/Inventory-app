@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     }
 
     return Response.json({ user });
-  } catch (error) {
+  } catch {
     return Response.json({ error: "Failed to fetch user" }, { status: 500 });
   }
 }

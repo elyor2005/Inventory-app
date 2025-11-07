@@ -35,7 +35,7 @@ export default function MobileMenu() {
         const data = await response.json();
         setIsAdmin(data.user.role === "admin");
       }
-    } catch (error) {
+    } catch {
       // Silent fail
     }
   };

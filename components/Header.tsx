@@ -45,7 +45,7 @@ export default function Header() {
         const data = await response.json();
         setIsAdmin(data.user.role === "admin");
       }
-    } catch (error) {
+    } catch {
       // Silent fail
     }
   };

@@ -32,7 +32,7 @@ export function LanguageProvider({ children, initialLocale = defaultLocale }: { 
         const loadedMessages = await import(`@/messages/${locale}.json`);
         setMessages(loadedMessages.default || loadedMessages);
         setIsReady(true);
-      } catch (error) {
+      } catch {
         setIsReady(true);
       }
     };

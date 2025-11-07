@@ -23,7 +23,7 @@ export async function fetchGoogleProfile(accessToken: string) {
       name: profile.name,
       image: profile.picture,
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }
@@ -56,7 +56,7 @@ export async function fetchGitHubProfile(accessToken: string) {
 
       if (emailResponse.ok) {
         const emails = await emailResponse.json();
-        const primaryEmail = emails.find((e: any) => e.primary);
+        const primaryEmail = emails.find((e: { primary: boolean; email: string }) => e.primary);
         email = primaryEmail?.email || emails[0]?.email;
       }
     }
@@ -66,7 +66,7 @@ export async function fetchGitHubProfile(accessToken: string) {
       name: profile.name || profile.login,
       image: profile.avatar_url,
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

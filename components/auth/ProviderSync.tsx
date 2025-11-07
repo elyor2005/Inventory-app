@@ -41,7 +41,7 @@ export default function ProviderSync() {
             // This ensures the useCurrentUser hook gets the latest provider-specific data
             window.location.href = window.location.pathname;
           }
-        } catch (error) {
+        } catch {
           syncedRef.current = false; // Allow retry on next mount
         }
       }

@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       select: { providerData: true },
     });
 
-    const providerData = (dbUser?.providerData as any) || {};
+    const providerData: Record<string, unknown> = (dbUser?.providerData as Record<string, unknown>) || {};
     providerData[provider] = profileData;
 
     // Update user with new provider data
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       where: { id: session.user.id },
       data: {
         lastProvider: provider,
-        providerData: providerData,
+        providerData: providerData as never,
       },
     });
 
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
       provider,
       profileData,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to sync provider data" },
       { status: 500 }

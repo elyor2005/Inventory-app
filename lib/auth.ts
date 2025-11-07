@@ -64,7 +64,7 @@ export const auth = betterAuth({
           });
 
           if (account) {
-            const providerData: any = {};
+            const providerData: Record<string, { name: string | null; image: string | null | undefined; email: string }> = {};
             providerData[account.providerId] = {
               name: user.name,
               image: user.image,
@@ -75,12 +75,10 @@ export const auth = betterAuth({
               where: { id: user.id },
               data: {
                 lastProvider: account.providerId,
-                providerData: providerData,
+                providerData: providerData as never,
               },
             });
           }
-
-          return user;
         },
       },
     },
@@ -121,14 +119,14 @@ export const auth = betterAuth({
             }
 
             if (profileData) {
-              const providerData = (user?.providerData as any) || {};
+              const providerData: Record<string, unknown> = (user?.providerData as Record<string, unknown>) || {};
               providerData[recentAccount.providerId] = profileData;
 
               await prisma.user.update({
                 where: { id: session.userId },
                 data: {
                   lastProvider: recentAccount.providerId,
-                  providerData: providerData,
+                  providerData: providerData as never,
                 },
               });
             }
@@ -158,19 +156,18 @@ export const auth = betterAuth({
             }
 
             if (profileData && user) {
-              const providerData = (user.providerData as any) || {};
+              const providerData: Record<string, unknown> = (user.providerData as Record<string, unknown>) || {};
               providerData[account.providerId] = profileData;
 
               await prisma.user.update({
                 where: { id: account.userId },
                 data: {
                   lastProvider: account.providerId,
-                  providerData: providerData,
+                  providerData: providerData as never,
                 },
               });
             }
           }
-          return account;
         },
       },
     },
